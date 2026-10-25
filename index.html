@@ -509,6 +509,35 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
 #bilanout .study .note{font-size:1.1rem;padding:.15em .6em;background:var(--accent-soft);color:var(--accent-ink);border:none}
 
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* Ressenti en boutons */
+.fgroup{display:flex;flex-direction:column;gap:5px;min-width:0}
+.flab{font-size:.84rem;color:var(--muted)}
+.fhint{font-size:.74rem;color:var(--muted)}
+.fbtns{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:4px}
+.fbtns button{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:.86rem;cursor:pointer;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;gap:1px}
+.fbtns button b{font-size:1rem}
+.fbtns button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+.fbtns button:hover{border-color:var(--ink)}
+.feel .fgroup + .fgroup{margin-top:4px}
+@media (max-width:640px){ .fbtns[style*="--n:5"] button{font-size:.7rem} }
+/* Lisibilité */
+.fgrid .fw{display:block;font-size:.74rem;color:var(--muted);margin-top:1px}
+.gpills{display:flex;justify-content:center;gap:6px;margin-top:4px}
+.gpill{font-size:.76rem;font-weight:650;padding:2px 9px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.gpill.ok{background:var(--accent-soft);color:var(--accent-ink)}
+.wstrip .dot{width:9px;height:9px}
+.wstrip .dot.plan{border:2px dashed var(--ink);background:transparent;box-sizing:border-box}
+.wtoday{font-size:.82rem;margin:4px 0 0;align-self:center;min-height:32px}
+.wlist.swl{animation:swl .2s ease-out} .wlist.swr{animation:swr .2s ease-out}
+@keyframes swl{from{transform:translateX(24px);opacity:.5}} @keyframes swr{from{transform:translateX(-24px);opacity:.5}}
+@media (prefers-reduced-motion: reduce){ .wlist.swl,.wlist.swr{animation:none} }
+.cityrow{gap:4px 10px}
+.cityrow .linkbtn{font-size:.84rem;min-height:32px}
+@media (max-width:899px){
+  .tgrid{display:flex;flex-direction:column}
+  .tcol{display:contents}
+  #todaycard{order:1} #formcard{order:2} #goalcard{order:3} #weekstrip{order:4} #lastcard{order:5}
+}
 /* Progrès */
 .loadhead > .hh{order:1;flex:1 1 auto}
 .loadhead > .iconbtn.sm,.loadhead > .bnav{order:2}
@@ -582,13 +611,14 @@ dialog{border-radius:20px}
     <section class="view" data-view="today" aria-label="Aujourd'hui">
       <div class="cityrow">
         <span class="citynow" id="citynow"></span>
-        <button class="linkbtn" id="citychg" type="button">Changer de ville</button>
+        <button class="linkbtn" id="citychg" type="button">Changer</button>
       </div>
       <div class="importcard" id="importcard" hidden></div>
       <div class="tgrid">
         <div class="tcol">
-          <div class="pcard todaycard" id="todaycard"></div>
+          <div class="pcard todaycard" id="todaycard"><p class="hint" style="margin:0">Chargement de ta journée…</p></div>
           <div class="pcard" id="formcard"></div>
+          <div class="pcard" id="lastcard" hidden></div>
         </div>
         <div class="tcol">
           <div class="goalcard pcard" id="goalcard">
@@ -600,7 +630,6 @@ dialog{border-radius:20px}
             <div class="ggrid" id="ggrid"></div>
           </div>
           <div class="pcard" id="weekstrip"></div>
-          <div class="pcard" id="lastcard" hidden></div>
         </div>
       </div>
     </section>
@@ -616,10 +645,10 @@ dialog{border-radius:20px}
       <div id="weekwrap">
         <div class="wnav">
           <button class="iconbtn" id="wprev" aria-label="Semaine précédente">‹</button>
-          <div class="wlabel"><b id="wlabel"></b><span id="wsum"></span></div>
+          <div class="wlabel"><b id="wlabel"></b><span id="wsum"></span><button class="linkbtn wtoday" id="wtoday" type="button" hidden>Revenir à cette semaine</button></div>
           <button class="iconbtn" id="wnext" aria-label="Semaine suivante">›</button>
         </div>
-        <p class="hint">Touche la pastille de dispo pour la changer, ou la date pour ouvrir la journée.</p>
+        <p class="hint">Touche la pastille de dispo pour la changer, la date pour ouvrir la journée. Glisse pour changer de semaine.</p>
         <ul class="wlist" id="wlist"></ul>
         <div class="pcard nextdispo" id="nextdispo" hidden></div>
       </div>
@@ -1160,14 +1189,21 @@ const rawCache = new Map(), streamCache = new Map();
 const actView = { id: null, a: null, raw: null, st: null, x: 'dist', hover: null, panels: [], frame: 0 };
 const saved = t => { $('actsave').textContent = t; $('savestate').textContent = t; };
 const findAct = id => state.acts.find(x => String(x.ext_id) === String(id));
+const FEEL_WORDS = ['très mauvaises', 'mauvaises', 'moyennes', 'bonnes', 'excellentes'];
+// Groupe de gros boutons (ressenti) : un clic choisit, un 2e clic sur le même efface.
+function fbtns(f, label, opts, cur, hint){
+  return '<div class="fgroup wide" role="group" aria-label="'+label+'"><span class="flab">'+label+'</span><div class="fbtns" style="--n:'+opts.length+'">'
+    + opts.map(([v, t]) => '<button type="button" data-f="'+f+'" data-fv="'+v+'" aria-pressed="'+(String(cur ?? '') === v)+'">'+t+'</button>').join('')
+    + '</div>'+(hint ? '<span class="fhint">'+hint+'</span>' : '')+'</div>';
+}
 function feelHTML(a){
   const id = String(a.ext_id), r = state.ressentis[id] || {}, pain = r.douleur || '';
   const opt = (list, v) => list.map((t,i) => '<option value="'+(i||'')+'"'+(String(v||'') === String(i||'') ? ' selected' : '')+'>'+(t || '—')+'</option>').join('');
   return '<div class="act" data-id="'+esc(id)+'">'
     + '<div class="feel"><span class="feelhead">Mon ressenti</span>'
-    + '<label>Effort<select data-f="rpe">'+opt(RPE_OPTS, r.rpe)+'</select></label>'
-    + '<label>Sensations<select data-f="forme">'+opt(FORME_OPTS, r.forme)+'</select></label>'
-    + '<label>Douleur<select data-f="douleur">'+PAIN_OPTS.map(([v,t]) => '<option value="'+v+'"'+(v === pain ? ' selected' : '')+'>'+t+'</option>').join('')+'</select></label>'
+    + fbtns('rpe', 'Effort', Array.from({ length: 10 }, (_, i) => [String(i+1), String(i+1)]), r.rpe, '1 très facile · 5 modéré · 10 maximal')
+    + fbtns('forme', 'Sensations', FEEL_WORDS.map((w, i) => [String(i+1), '<b>'+(i+1)+'</b>'+w]), r.forme)
+    + fbtns('douleur', 'Douleur', PAIN_OPTS.slice(1).map(([v, t]) => [v, t]), pain)
     + '<label class="wide"'+(pain && pain !== 'aucune' ? '' : ' hidden')+'>Où ?<input data-f="zone" type="text" maxlength="80" placeholder="Ex. genou droit, mollet…" value="'+esc(r.zone||'')+'"></label>'
     + '<label class="wide">Note pour Miguel<input data-f="note" type="text" maxlength="300" placeholder="Ex. jambes lourdes, vent de face au retour…" value="'+esc(r.note||'')+'"></label>'
     + '</div>'
@@ -1417,7 +1453,19 @@ function onFeel(e){
 }
 $('actfeel').addEventListener('change', e => { if (e.target.tagName === 'SELECT') onFeel(e); });
 $('actfeel').addEventListener('input', e => { if (e.target.tagName === 'INPUT') onFeel(e); });
-$('actfeel').addEventListener('click', e => { const b = e.target.closest('[data-study]'), box = e.target.closest('.act'); if (b && box) runStudy(box.dataset.id); });
+$('actfeel').addEventListener('click', e => {
+  const box = e.target.closest('.act'); if (!box) return;
+  const fb = e.target.closest('[data-fv]');
+  if (fb){
+    const f = fb.dataset.f, on = fb.getAttribute('aria-pressed') === 'true', v = on ? '' : fb.dataset.fv;
+    for (const x of fb.parentNode.querySelectorAll('[data-fv]')) x.setAttribute('aria-pressed', String(!on && x === fb));
+    if (f === 'douleur'){ const z = box.querySelector('[data-f="zone"]'); z.closest('label').hidden = !v || v === 'aucune'; if (z.closest('label').hidden) z.value = ''; else z.focus(); }
+    setRessenti(box.dataset.id, f, v);
+    const hint = box.querySelector('.studybar .hint'); if (hint) hint.hidden = !!state.ressentis[box.dataset.id];
+    return;
+  }
+  if (e.target.closest('[data-study]')) runStudy(box.dataset.id);
+});
 
 /* ---------- Étude de la sortie par Miguel ---------- */
 // Étude enregistrée dans le doc « etudes » (activities[ext_id]) : rouvrir la journée ne relance pas l'API.
@@ -2438,10 +2486,10 @@ function renderCityNow(){
   const r = state.reglages, el = $('citynow'), w = WX.days[key(t0)];
   if (document.activeElement !== $('cityin')) $('cityin').value = r.ville || '';
   el.classList.remove('err');
-  $('citychg').textContent = r.ville ? 'Changer de ville' : 'Indiquer ma ville';
+  $('citychg').textContent = r.ville ? 'Changer' : 'Indiquer ma ville';
   if (!r.ville){ el.textContent = '📍 Indique ta ville pour voir la météo dans le calendrier.'; return; }
   if (!w){ el.textContent = '📍 '+r.ville+(WX.err ? ' · '+WX.err : ''); return; }
-  el.innerHTML = '<span aria-hidden="true">'+wxEmoji(w.code)+'</span> Aujourd\'hui <b>'+esc(WX_TXT[w.code] || '')+'</b>, '+Math.round(w.tmin)+' à '+Math.round(w.tmax)+' °C'
+  el.innerHTML = '<span aria-hidden="true">'+wxEmoji(w.code)+'</span> <b>'+esc(r.ville)+'</b> · '+esc(WX_TXT[w.code] || '')+' · '+Math.round(w.tmin)+' à '+Math.round(w.tmax)+' °C'
     + (r.admin ? ' <span title="'+esc(r.admin)+'">· '+esc(r.admin)+'</span>' : '');
 }
 async function geocode(q, n){
@@ -2757,6 +2805,14 @@ function renderToday(){
   $('todaycard').innerHTML = html;
   renderForm(); renderWeekStrip(); renderLastCard();
 }
+// Fraîcheur (forme − fatigue) en un mot.
+const freshWord = t => t > 5 ? 'frais' : t >= -10 ? 'équilibré' : t >= -25 ? 'en charge' : 'fatigué';
+// Objectifs de la semaine en pastilles (vue semaine, bandeau).
+function goalPills(ws){
+  if (ws > t0 || addDays(ws, 6) < PLAN_START) return '';
+  const w = goalWeek(ws), p = (ok, lab) => '<span class="gpill'+(ok ? ' ok' : '')+'">'+lab+(ok ? ' ✓' : '')+'</span>';
+  return '<span class="gpills">'+p(w.ride.ok, 'Vélo')+p(w.run.ok, 'Course')+'</span>';
+}
 function renderForm(){
   const series = computeSeries(), now = series.find(p => p.k === key(t0));
   const alerts = computeAlerts(series);
@@ -2772,7 +2828,7 @@ function renderForm(){
       + '<div><span>FC au repos</span><b>'+(r.last != null ? nf0.format(r.last) : '–')+'</b> '+trend(r.m7, r.m30, false)+'</div></div>';
   }
   $('formcard').innerHTML = '<div class="cardhead"><h3>Ta forme</h3>'+(upd ? '<small>'+esc(upd)+'</small>' : '')+'<button class="more" data-goto="prog">Progrès ›</button></div>'
-    + (now ? '<div class="fgrid"><div><small>Forme 42 j</small><b style="color:var(--c-fit)">'+nf0.format(now.ctl)+'</b></div><div><small>Fatigue 7 j</small><b style="color:var(--c-fat)">'+nf0.format(now.atl)+'</b></div><div><small>Fraîcheur</small><b>'+fmtSigned(Math.round(now.tsb))+'</b></div></div>' : '')
+    + (now ? '<div class="fgrid"><div><small>Forme 42 j</small><b style="color:var(--c-fit)">'+nf0.format(now.ctl)+'</b></div><div><small>Fatigue 7 j</small><b style="color:var(--c-fat)">'+nf0.format(now.atl)+'</b></div><div><small>Fraîcheur</small><b>'+fmtSigned(Math.round(now.tsb))+'</b><small class="fw">'+freshWord(now.tsb)+'</small></div></div>' : '')
     + health
     + (alerts.length ? '<p class="fnote"><b style="color:var(--run)">À surveiller :</b> '+esc(alerts[0].t)+' : '+esc(alerts[0].x)+'</p>' : '');
 }
@@ -2820,7 +2876,8 @@ function renderWeekView(){
   if (!state.user) return;
   const ws = CALV.ws, we = addDays(ws, 6), byDay = actsByDay(), tot = weekTotals(ws, byDay);
   $('wlabel').textContent = (we >= PLAN_START ? 'Sem. '+planWeek(we)+' · ' : '')+shortFmt(ws)+' – '+shortFmt(we);
-  $('wsum').innerHTML = fmtHM(tot.all)+(tot.ride.km ? ' · vélo '+fmtKmC(tot.ride.km) : '')+(tot.run.km ? ' · course '+fmtKmC(tot.run.km) : '')+(tot.swim.s ? ' · natation '+fmtSwimM(tot.swim.km) : '')+goalBadges(ws);
+  $('wsum').innerHTML = fmtHM(tot.all)+(tot.ride.km ? ' · vélo '+fmtKmC(tot.ride.km) : '')+(tot.run.km ? ' · course '+fmtKmC(tot.run.km) : '')+(tot.swim.s ? ' · natation '+fmtSwimM(tot.swim.km) : '')+goalPills(ws);
+  $('wtoday').hidden = key(ws) === key(startOfWeek(t0));
   const rows = [];
   for (let i = 0; i < 7; i++){
     const d = addDays(ws, i), k = key(d), dispo = state.dispos[k] || {}, wx = WX.days[k];
@@ -2843,6 +2900,18 @@ function renderWeekView(){
   if (!box.hidden) box.innerHTML = '<h3>Semaine prochaine : tes dispos</h3><p>Miguel prépare mieux quand il connaît les 2 semaines à venir. '+filled+' jour'+(filled > 1 ? 's' : '')+' sur 7 renseigné'+(filled > 1 ? 's' : '')+'.</p><button class="btn primary" id="gonext">Remplir '+shortFmt(nws)+' – '+shortFmt(addDays(nws, 6))+'</button>';
 }
 $('wprev').addEventListener('click', () => { CALV.ws = addDays(CALV.ws, -7); renderWeekView(); });
+$('wtoday').addEventListener('click', () => { CALV.ws = startOfWeek(t0); renderWeekView(); });
+// Glisser à gauche / à droite sur la liste : semaine suivante / précédente.
+(() => {
+  let x0 = null, y0 = 0;
+  $('wlist').addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+  $('wlist').addEventListener('touchend', e => {
+    if (x0 == null) return; const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null;
+    if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx)*0.6) return;
+    CALV.ws = addDays(CALV.ws, dx < 0 ? 7 : -7); renderWeekView();
+    $('wlist').classList.remove('swl', 'swr'); void $('wlist').offsetWidth; $('wlist').classList.add(dx < 0 ? 'swl' : 'swr');
+  }, { passive: true });
+})();
 $('wnext').addEventListener('click', () => { CALV.ws = addDays(CALV.ws, 7); renderWeekView(); });
 $('nextdispo').addEventListener('click', e => { if (e.target.closest('#gonext')){ CALV.ws = addDays(startOfWeek(t0), 7); renderWeekView(); $('weekwrap').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
 $('wlist').addEventListener('click', e => {
@@ -3058,7 +3127,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-10-25-refonte-2';
+const APP_VERSION = '2026-10-25-refonte-3';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
