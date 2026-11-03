@@ -781,15 +781,42 @@ body{background:var(--bg);color:var(--ink);font:14px/1.4 var(--f-display);overfl
 .keys i{display:inline-block;width:12px;height:8px;border-radius:2px}
 .status{position:absolute;z-index:1000;left:50%;top:64px;transform:translateX(-50%);padding:6px 10px;font-size:12px;color:var(--muted)}
 
+.morebtn{display:none}
 @media (max-width:640px){
-  .top{right:56px}
+  .top{right:56px;top:10px;left:10px;gap:6px}
+  .morebtn{display:grid;place-items:center;width:38px;height:36px;padding:0;color:var(--ink);cursor:pointer}
+  .morebtn svg{width:17px;height:17px}
+  .top>.layers:not(.models){order:0} .morebtn{order:1} .top .models,.top .tog{order:2}
+  #app.more .morebtn{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .top .models,.top .tog,.bases{display:none}
+  #app.more .top .models,#app.more .top .tog{display:flex}
+  #app.more .bases{display:flex;left:10px;right:auto;bottom:72px}
+  .layers{padding:2px}
+  .layers button{padding:8px 9px;font-size:12.5px}
+  .tog{padding:7px 10px;font-size:12.5px}
+  .legend{left:10px;bottom:20px;width:min(240px,calc(100% - 20px));padding:5px 8px 4px}
+  .legend .ttl{font-size:10px;margin-bottom:4px}
+  .legend .bar{height:7px}
+  .legend .ticks{font-size:9px;height:11px;line-height:11px}
+  .leaflet-control-attribution{font-size:9px;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tl{gap:6px;padding-top:8px;padding-left:12px;padding-right:12px}
+  .tl-row{gap:8px;flex-wrap:wrap}
+  #play{width:36px;height:36px}
+  .when{min-width:0;flex:1}
+  .when strong{font-size:18px}
+  .pt{order:5;width:100%;flex-wrap:nowrap;gap:8px}
+  .pt-name{flex:none;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+  .pt-name::before{display:inline-block;vertical-align:-1px;margin-right:6px}
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;min-width:0;mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .chips::-webkit-scrollbar{display:none}
+  .strip-wrap{height:46px}
+  .keys{gap:10px;font-size:10.5px}
+  .keys .hint,#scale{display:none}
   .layers button{padding:7px 8px;font-size:12px}
   .layers button svg{display:none}
   .brand{display:none}
   .mlbl{display:none}
   .pt{margin-left:0;width:100%}
-  .legend{bottom:8px;width:calc(100% - 205px)}
-  .bases{bottom:30px}
   .bases .mlbl{display:none}
 }
 @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
@@ -814,6 +841,7 @@ body{background:var(--bg);color:var(--ink);font:14px/1.4 var(--f-display);overfl
         <button type="button" data-model="gfs" aria-pressed="false" title="NOAA GFS, 25 km">GFS</button>
       </div>
       <label class="card tog"><input type="checkbox" id="flowOn" checked> Particules de vent</label>
+      <button type="button" class="card morebtn" id="moreBtn" aria-expanded="false" aria-label="Plus de réglages : modèle, particules, fond de carte"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 4h7M13 4h1M2 8h2M8 8h6M2 12h8M14 12h0"/><circle cx="11" cy="4" r="1.6"/><circle cx="6" cy="8" r="1.6"/><circle cx="12" cy="12" r="1.6"/></svg></button>
     </div>
     <div class="card layers bases" role="group" aria-label="Fond de carte"><span class="mlbl">Fond</span>
       <button type="button" data-base="relief" aria-pressed="true">Relief</button>
@@ -834,7 +862,7 @@ body{background:var(--bg);color:var(--ink);font:14px/1.4 var(--f-display);overfl
     </div>
     <div class="strip-wrap" id="stripWrap"><canvas id="strip"></canvas></div>
     <input type="range" id="t" min="0" max="96" step="1" value="0" aria-label="Heure de la prévision">
-    <div class="keys"><span><i style="background:var(--rain)"></i>Pluie (mm/h)</span><span><i style="background:var(--windline);height:2px"></i>Vent (km/h)</span><span><i style="background:rgb(var(--cloud) / .45)"></i>Couverture nuageuse</span><span><i style="background:var(--night);border:1px solid var(--line)"></i>Nuit</span><span>Touchez la carte pour changer de point</span><span id="scale"></span></div>
+    <div class="keys"><span><i style="background:var(--rain)"></i>Pluie (mm/h)</span><span><i style="background:var(--windline);height:2px"></i>Vent (km/h)</span><span><i style="background:rgb(var(--cloud) / .45)"></i>Couverture nuageuse</span><span><i style="background:var(--night);border:1px solid var(--line)"></i>Nuit</span><span class="hint">Touchez la carte pour changer de point</span><span id="scale"></span></div>
   </footer>
 </div>
 
@@ -1263,6 +1291,7 @@ document.querySelectorAll('[data-model]').forEach(b => b.addEventListener('click
   } catch (e) { S.model = prev; mark(prev); st.textContent = MODELS[next].label + ' indisponible pour cette zone'; setTimeout(() => st.hidden = true, 3500); }
   finally { fetching = false; }
 }));
+$('#moreBtn').addEventListener('click', () => { const on = $('#app').classList.toggle('more'); $('#moreBtn').setAttribute('aria-expanded', on); });
 $('#flowOn').addEventListener('change', e => { S.flow = e.target.checked; flowOn(); });
 $('#t').addEventListener('input', e => { if (S.playing) setPlaying(false); setTime(startMs() + e.target.value * HOUR, true); });
 $('#play').addEventListener('click', () => setPlaying(!S.playing));
@@ -1274,6 +1303,7 @@ const scrub = e => { const r = strip.getBoundingClientRect(), f = clamp((e.clien
 sw.addEventListener('pointerdown', e => { if (S.playing) setPlaying(false); sw.setPointerCapture(e.pointerId); scrub(e); });
 sw.addEventListener('pointermove', e => { if (sw.hasPointerCapture(e.pointerId)) scrub(e); });
 map.on('click', e => {
+  if ($('#app').classList.contains('more')){ $('#app').classList.remove('more'); $('#moreBtn').setAttribute('aria-expanded', false); }
   setPoint(e.latlng.lat, e.latlng.lng, nearestCity(e.latlng));
   if (!ptPop) ptPop = L.popup({ className: 'ptpop', autoPan: true, maxWidth: 260, closeOnClick: false });
   const top = document.querySelector('.top'), mr = map.getContainer().getBoundingClientRect(), tb = top ? top.getBoundingClientRect().bottom - mr.top : 0;
