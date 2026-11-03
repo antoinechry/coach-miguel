@@ -408,7 +408,11 @@ section{margin-top:0}
 /* Vue Météo : page meteo.html dans un cadre */
 .wxframe{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);height:calc(100dvh - 190px - env(safe-area-inset-bottom));min-height:420px}
 .wxframe iframe{display:block;width:100%;height:100%;border:0}
-@media (max-width:640px){.wxframe{margin:0 -10px;border-radius:0;border-left:0;border-right:0;height:calc(100dvh - 148px - env(safe-area-inset-bottom));min-height:380px}}
+@media (max-width:899px){
+  body.view-meteo.has-tabs header.top{display:none}
+  body.view-meteo.has-tabs .wrap{padding:0 0 calc(70px + env(safe-area-inset-bottom));max-width:none}
+  body.view-meteo.has-tabs .wxframe{margin:0;border-radius:0;border:0;height:calc(100dvh - 70px - env(safe-area-inset-bottom));min-height:360px;padding-top:env(safe-area-inset-top)}
+}
 @media (min-width:900px){.wxframe{height:calc(100dvh - 150px);min-height:520px;width:min(1124px, calc(100vw - 220px - 56px))}}
 
 /* En-tête */
@@ -2745,6 +2749,7 @@ function setView(v, keepScroll){
   if (!VIEWS.includes(v)) v = 'today';
   curView = v;
   for (const s of document.querySelectorAll('#app .view')) s.hidden = s.dataset.view !== v;
+  document.body.classList.toggle('view-meteo', v === 'meteo');
   for (const b of $('tabbar').querySelectorAll('[data-view]')){ if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   updateTitle();
   try { localStorage.setItem('cm-view', v); } catch(_){}
@@ -2758,7 +2763,8 @@ function loadWxFrame(){
   if (curView !== 'meteo' && !$('wxframe').dataset.src) return;
   const r = state.reglages || {}, q = new URLSearchParams();
   if (Number.isFinite(+r.lat) && Number.isFinite(+r.lon) && r.lat !== null && r.lon !== null && r.lat !== ''){ q.set('lat', (+r.lat).toFixed(3)); q.set('lon', (+r.lon).toFixed(3)); if (r.ville) q.set('name', r.ville); }
-  const src = 'meteo.html' + (q.toString() ? '?' + q : '');
+  try { q.set('v', APP_VERSION); } catch(_){}
+  const src = 'meteo.html?' + q;
   const f = $('wxframe');
   if (f.dataset.src !== src){ f.dataset.src = src; f.src = src; }
 }
@@ -3152,7 +3158,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-03-meteo-3';
+const APP_VERSION = '2026-11-04-meteo-4';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
