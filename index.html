@@ -378,11 +378,11 @@ section{margin-top:0}
 .tabbar button[aria-current="page"]{color:var(--accent-ink)}
 .tbrand{display:none}
 @media (max-width:899px){
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(8px + env(safe-area-inset-bottom))}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(8px + env(safe-area-inset-bottom))}
   .tabbar[hidden]{display:none}
   .tabbar .tmenu{display:none}
   .tabbar button{min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.74rem;font-weight:600}
-  .tabbar .ti{padding:4px 16px;border-radius:999px;display:flex}
+  .tabbar .ti{padding:4px 12px;border-radius:999px;display:flex}
   .tabbar button[aria-current="page"]{font-weight:750}
   .tabbar button[aria-current="page"] .ti{background:var(--accent-soft)}
   body.has-tabs .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
@@ -404,6 +404,11 @@ section{margin-top:0}
   .tabbar .tmenu .av{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.8rem;font-weight:700;flex:none}
   .wrap{max-width:1180px;padding:24px 28px 48px}
 }
+
+/* Vue Météo : page meteo.html dans un cadre */
+.wxframe{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);height:calc(100dvh - 190px - env(safe-area-inset-bottom));min-height:420px}
+.wxframe iframe{display:block;width:100%;height:100%;border:0}
+@media (min-width:900px){.wxframe{height:calc(100dvh - 150px);min-height:520px;width:min(1124px, calc(100vw - 220px - 56px))}}
 
 /* En-tête */
 header.top{align-items:center}
@@ -572,6 +577,7 @@ dialog{border-radius:20px}
   <button data-view="today" aria-current="page"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></span><span class="tl">Aujourd'hui</span></button>
   <button data-view="cal"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span class="tl">Calendrier</span></button>
   <button data-view="miguel"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><span class="tl">Miguel</span></button>
+  <button data-view="meteo"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.6-8 5.5 5.5 0 0 1 10.6 1.5A3.3 3.3 0 0 1 17 18z"/><path d="M3 21h4M11 21h10"/></svg></span><span class="tl">Météo</span></button>
   <button data-view="prog"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="tl">Progrès</span></button>
   <button class="tmenu" id="sidemenu" aria-haspopup="dialog"><span class="av" id="sideav">?</span><span class="tl">Mon menu</span></button>
 </nav>
@@ -709,6 +715,11 @@ dialog{border-radius:20px}
         <div id="bilanout" aria-live="polite"></div>
       </div>
       <div class="pcard" id="mighist"></div>
+    </section>
+
+    <section class="view" data-view="meteo" aria-labelledby="h-meteo" hidden>
+      <h2 id="h-meteo" class="vh">Météo</h2>
+      <div class="wxframe"><iframe id="wxframe" title="Miguel Météo : carte du vent, de la pluie, des nuages et de la température" loading="lazy" allow="fullscreen"></iframe></div>
     </section>
 
     <section class="view" data-view="prog" aria-labelledby="h-prog" hidden>
@@ -2485,6 +2496,7 @@ async function loadCityWx(force){
   renderCityNow(); renderCalendar();
 }
 function renderCityNow(){
+  loadWxFrame();
   const r = state.reglages, el = $('citynow'), w = WX.days[key(t0)];
   if (document.activeElement !== $('cityin')) $('cityin').value = r.ville || '';
   el.classList.remove('err');
@@ -2725,8 +2737,8 @@ function renderMissing(list){
 }
 /* ---------- Refonte : 4 vues (Aujourd'hui, Calendrier, Miguel, Progrès) ---------- */
 // Barre du bas sur téléphone, menu latéral sur ordinateur. Vue gardée dans l'adresse (#today…) et localStorage cm-view.
-const VIEWS = ['today', 'cal', 'miguel', 'prog'];
-const VIEW_TITLE = { cal: 'Calendrier', miguel: 'Miguel', prog: 'Progrès' };
+const VIEWS = ['today', 'cal', 'miguel', 'meteo', 'prog'];
+const VIEW_TITLE = { cal: 'Calendrier', miguel: 'Miguel', meteo: 'Météo', prog: 'Progrès' };
 let curView = 'today';
 function setView(v, keepScroll){
   if (!VIEWS.includes(v)) v = 'today';
@@ -2737,7 +2749,17 @@ function setView(v, keepScroll){
   try { localStorage.setItem('cm-view', v); } catch(_){}
   if (!/access_token|type=/.test(location.hash) && location.hash !== '#'+v) history.replaceState(null, '', '#'+v);
   if (v === 'prog'){ renderLoad(); if (WELL.days.length) drawHealth(); }
+  if (v === 'meteo') loadWxFrame();
   if (!keepScroll) window.scrollTo(0, 0);
+}
+// Vue Météo : meteo.html (Miguel Météo) chargée à la première ouverture, centrée sur la ville de « Moi ».
+function loadWxFrame(){
+  if (curView !== 'meteo' && !$('wxframe').dataset.src) return;
+  const r = state.reglages || {}, q = new URLSearchParams();
+  if (Number.isFinite(+r.lat) && Number.isFinite(+r.lon) && r.lat !== null && r.lon !== null && r.lat !== ''){ q.set('lat', (+r.lat).toFixed(3)); q.set('lon', (+r.lon).toFixed(3)); if (r.ville) q.set('name', r.ville); }
+  const src = 'meteo.html' + (q.toString() ? '?' + q : '');
+  const f = $('wxframe');
+  if (f.dataset.src !== src){ f.dataset.src = src; f.src = src; }
 }
 function initialView(){
   const h = location.hash.slice(1);
@@ -3129,7 +3151,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-10-25-logo';
+const APP_VERSION = '2026-11-03-meteo';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;

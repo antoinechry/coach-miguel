@@ -52,3 +52,7 @@ Application web statique de suivi d'entraînement (calendrier, charge, séances 
 
 ## Logo (25/10/2026)
 - « Anneau de forme » : M blanc au centre d'un anneau en deux arcs (vert `#A6D86E` forme, bleu `#7FB0F5` fatigue) sur `#16221B`. Source vectorielle `coach-miguel-logo.svg` ; `coach-miguel-logo.png` (512, coins arrondis, en-tête et menu latéral), `favicon.png` (64, traits renforcés, sans piste de l'anneau), `apple-touch-icon.png` (180, carré plein pour l'écran d'accueil iPhone) ; `theme-color` `#16221B`.
+
+## Miguel Météo (03/11/2026)
+- Page autonome `meteo.html` (carte Leaflet façon Windy : vent, pluie, nuages, température, particules, modèles AROME / ARPEGE / ECMWF / GFS via Open-Meteo, frise du point choisi). Paramètres d'URL `?lat=&lon=&name=` pour le point de départ (défaut Strasbourg).
+- Dans `index.html` : 5e vue **Météo** (`data-view="meteo"`, onglet du menu latéral et de la barre du bas, qui passe à 5 colonnes). `loadWxFrame` charge `meteo.html` dans `#wxframe` à la première ouverture, centrée sur la ville de « Moi » (`state.reglages` `lat` / `lon` / `ville`), et la recharge si la ville change (appel depuis `renderCityNow`).
