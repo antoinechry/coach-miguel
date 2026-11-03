@@ -772,6 +772,12 @@ body{background:var(--bg);color:var(--ink);font:14px/1.4 var(--f-display);overfl
 .pp-row dd em{font-style:normal;font-weight:500;color:var(--muted)}
 .pp-row .arr{width:13px;height:13px;color:var(--accent)}
 .pp-when{margin-top:8px;font-size:11.5px;color:var(--muted)}
+.days{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -2px;padding:1px 2px}
+.days::-webkit-scrollbar{display:none}
+.days button{flex:none;border:1px solid var(--line);background:none;color:var(--ink);font:600 12px/1 var(--f-display);padding:7px 10px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.days button:hover{border-color:var(--accent)}
+.days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.days .dsep{flex:none;width:1px;background:var(--line);margin:4px 2px}
 #speed{border:1px solid var(--line);background:var(--panel-solid);color:var(--ink);font:500 12px var(--f-mono);border-radius:7px;padding:6px 6px}
 .strip-wrap{position:relative;height:64px;cursor:ew-resize;touch-action:none}
 #strip{position:absolute;inset:0;width:100%;height:100%}
@@ -860,6 +866,7 @@ body{background:var(--bg);color:var(--ink);font:14px/1.4 var(--f-display);overfl
       <select id="speed" aria-label="Vitesse de lecture"><option value="1">×1</option><option value="2" selected>×2</option><option value="4">×4</option></select>
       <div class="pt"><span class="pt-name" id="ptName"></span><span class="chips" id="ptVals"></span></div>
     </div>
+    <div class="days" id="days" role="group" aria-label="Période affichée"></div>
     <div class="strip-wrap" id="stripWrap"><canvas id="strip"></canvas></div>
     <input type="range" id="t" min="0" max="96" step="1" value="0" aria-label="Heure de la prévision">
     <div class="keys"><span><i style="background:var(--rain)"></i>Pluie (mm/h)</span><span><i style="background:var(--windline);height:2px"></i>Vent (km/h)</span><span><i style="background:rgb(var(--cloud) / .45)"></i>Couverture nuageuse</span><span><i style="background:var(--night);border:1px solid var(--line)"></i>Nuit</span><span class="hint">Touchez la carte pour changer de point</span><span id="scale"></span></div>
@@ -1035,8 +1042,22 @@ let fetching = false;
 const S = { base: (() => { try { const v = localStorage.getItem('mm-base'); return v === 'topo' || v === 'plan' ? v : 'relief'; } catch (e) { return 'relief'; } })(), model: 'auto', g: null, at: null, layer: 'wind', flow: true, playing: false, speed: 2, tMs: Math.floor(Date.now() / HOUR) * HOUR, pt: (() => { const q = new URLSearchParams(location.search), la = parseFloat(q.get('lat')), lo = parseFloat(q.get('lon')); return isFinite(la) && isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180 ? { lat: la, lon: lo, name: (q.get('name') || '').slice(0, 60) || 'Ma ville' } : { lat: 48.573, lon: 7.752, name: 'Strasbourg' }; })(), series: null };
 document.getElementById('ptName').textContent = S.pt.name;
 const th = () => (S.tMs / 1000 - S.g.t0) / 3600;
-const startMs = () => Math.max(S.g.t0 * 1000, Math.floor(Date.now() / HOUR) * HOUR);
-const endMs = () => (S.g.t0 + (S.g.n - 1) * 3600) * 1000;
+// Fenêtre affichée en bas : 'all' (tous les jours), 'today' (journée en cours) ou minuit local (ms) d'un jour choisi.
+const dataStart = () => Math.max(S.g.t0 * 1000, Math.floor(Date.now() / HOUR) * HOUR);
+const dataEnd = () => (S.g.t0 + (S.g.n - 1) * 3600) * 1000;
+const midnight = ms => { const d = new Date(ms); d.setHours(0, 0, 0, 0); return d.getTime(); };
+const addDays = (ms, n) => { const d = new Date(ms); d.setDate(d.getDate() + n); return d.getTime(); };
+function winBounds() {
+  const a0 = dataStart(), b0 = dataEnd();
+  if (S.win === 'all') return [a0, b0];
+  const d = S.win === 'today' ? midnight(Date.now()) : S.win;
+  let a = Math.max(a0, d), b = Math.min(b0, addDays(d, 1));
+  if (S.win === 'today') b = Math.min(b0, Math.max(b, a + 6 * HOUR));
+  return b - a >= HOUR ? [a, b] : [a0, b0];
+}
+const startMs = () => winBounds()[0];
+const endMs = () => winBounds()[1];
+S.win = 'all';
 
 /* ---------- carte ---------- */
 const map = L.map('map', { zoomControl: false, minZoom: 4, maxZoom: 11, worldCopyJump: false, attributionControl: true }).setView(S.pt.name === 'Strasbourg' && S.pt.lat === 48.573 ? [48.3, 7.6] : [S.pt.lat, S.pt.lon], 7);
@@ -1201,7 +1222,7 @@ function drawStrip() {
   if (!S.g || !S.series) return;
   const r = strip.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1), w = r.width, h = r.height;
   strip.width = w * dpr; strip.height = h * dpr; const c = strip.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
-  const s = S.series, g = S.g, a = startMs(), b = endMs(), h0 = Math.round((a / 1000 - g.t0) / 3600), h1 = g.n - 1, bw = (w - 2 * INSET) / Math.max(1, h1 - h0);
+  const s = S.series, g = S.g, a = startMs(), b = endMs(), h0 = Math.round((a / 1000 - g.t0) / 3600), h1 = Math.min(g.n - 1, Math.round((b / 1000 - g.t0) / 3600)), bw = (w - 2 * INSET) / Math.max(1, h1 - h0);
   const top = 14, bot = h - 2, ph = bot - top;
   for (let k = h0; k <= h1; k++) { const x = xOf((g.t0 + k * 3600) * 1000, w);
     if (s.night[k]) { c.fillStyle = TOK.night; c.fillRect(x - bw / 2, top, bw + .5, ph); }
@@ -1209,14 +1230,19 @@ function drawStrip() {
   // jours
   c.font = '600 10.5px Archivo, system-ui, sans-serif'; c.textBaseline = 'top';
   for (let k = h0; k <= h1; k++) { const ms = (g.t0 + k * 3600) * 1000, dt = new Date(ms); if (dt.getHours() !== 0 && k !== h0) continue;
-    const x = xOf(ms, w); if (k !== h0) { c.fillStyle = TOK.line; c.fillRect(Math.round(x), 0, 1, h); }
+    const x = xOf(ms, w); if (k !== h0 && x > w - 40) continue; if (k !== h0) { c.fillStyle = TOK.line; c.fillRect(Math.round(x), 0, 1, h); }
     const nextMid = xOf(ms + (24 - dt.getHours()) * HOUR, w);
     if (nextMid - x > 70 || k !== h0) { c.fillStyle = TOK.muted; c.fillText(DF.format(dt), x + 4, 0); } }
+  if (b - a <= 30 * HOUR) { // un seul jour : repères toutes les 3 h
+    c.font = '500 9.5px "IBM Plex Mono", ui-monospace, monospace'; c.textAlign = 'center';
+    for (let k = h0; k <= h1; k++) { const ms = (g.t0 + k * 3600) * 1000, hr = new Date(ms).getHours(); if (hr % 3 || hr === 0) continue;
+      const x = xOf(ms, w); if (x < 78 || x > w - 16) continue; c.fillStyle = TOK.line; c.fillRect(Math.round(x), top, 1, ph); c.fillStyle = TOK.muted; c.fillText(hr + 'h', x, 1); }
+    c.textAlign = 'start'; }
   // pluie
-  const pmax = Math.max(2, ...s.pr.slice(h0)); c.fillStyle = TOK.rain;
+  const pmax = Math.max(2, ...s.pr.slice(h0, h1 + 1)); c.fillStyle = TOK.rain;
   for (let k = h0; k <= h1; k++) if (s.pr[k] >= .05) { const x = xOf((g.t0 + k * 3600) * 1000, w), bh = Math.max(1.5, s.pr[k] / pmax * (ph - 8)); c.fillRect(x - bw * .36, bot - bh, Math.max(1, bw * .72), bh); }
   // vent
-  const wmax = Math.max(40, ...s.ws.slice(h0)); c.strokeStyle = TOK.wind; c.lineWidth = 1.8; c.lineJoin = 'round'; c.beginPath();
+  const wmax = Math.max(40, ...s.ws.slice(h0, h1 + 1)); c.strokeStyle = TOK.wind; c.lineWidth = 1.8; c.lineJoin = 'round'; c.beginPath();
   for (let k = h0; k <= h1; k++) { const x = xOf((g.t0 + k * 3600) * 1000, w), y = bot - s.ws[k] / wmax * (ph - 8); k === h0 ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke();
   $('#scale').textContent = `Échelle de la frise : pluie jusqu'à ${pmax.toFixed(1).replace('.', ',')} mm/h · vent jusqu'à ${Math.round(wmax)} km/h`;
   // curseur
@@ -1295,7 +1321,30 @@ $('#moreBtn').addEventListener('click', () => { const on = $('#app').classList.t
 $('#flowOn').addEventListener('change', e => { S.flow = e.target.checked; flowOn(); });
 $('#t').addEventListener('input', e => { if (S.playing) setPlaying(false); setTime(startMs() + e.target.value * HOUR, true); });
 $('#play').addEventListener('click', () => setPlaying(!S.playing));
-$('#nowBtn').addEventListener('click', () => { setPlaying(false); setTime(Math.floor(Date.now() / HOUR) * HOUR); });
+$('#nowBtn').addEventListener('click', () => { setPlaying(false); const n = Math.floor(Date.now() / HOUR) * HOUR, [a, b] = winBounds(); if (n < a || n > b) setWin('today', true); setTime(n); });
+const DAYF = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric' });
+function renderDays() {
+  if (!S.g) return;
+  const t = midnight(Date.now()), last = midnight(dataEnd()), days = [];
+  for (let d = addDays(t, 1); d <= last && days.length < 15; d = addDays(d, 1)) if (Math.min(dataEnd(), addDays(d, 1)) - d >= 6 * HOUR) days.push(d);
+  if (typeof S.win === 'number' && !days.includes(S.win)) S.win = 'all';
+  const nb = days.length + 1, btn = (v, label, title) => `<button type="button" data-win="${v}" aria-pressed="${String(S.win) === String(v)}"${title ? ` title="${title}"` : ''}>${label}</button>`;
+  $('#days').innerHTML = btn('today', 'Aujourd\'hui') + days.map(d => btn(d, DAYF.format(new Date(d)).replace('.', ''), DF.format(new Date(d)))).join('') + `<span class="dsep" aria-hidden="true"></span>` + btn('all', nb + ' jours', 'Tous les jours de la prévision');
+}
+function setWin(v, keepTime) {
+  S.win = v === 'all' || v === 'today' ? v : +v;
+  for (const x of document.querySelectorAll('#days [data-win]')) x.setAttribute('aria-pressed', String(x.dataset.win) === String(S.win));
+  if (!keepTime) {
+    const [a, b] = winBounds(), n = Math.floor(Date.now() / HOUR) * HOUR;
+    let ms = S.tMs;
+    if (S.win === 'today' || S.win === 'all') { if (ms < a || ms > b) ms = n; }
+    else { const hr = new Date(S.tMs).getHours(); ms = S.win + (hr >= 7 && hr <= 20 ? hr : 9) * HOUR; }
+    setTime(clamp(ms, a, b));
+  } else syncRange();
+  drawStrip();
+  const sel = document.querySelector('#days [aria-pressed="true"]'); if (sel) sel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+$('#days').addEventListener('click', e => { const b = e.target.closest('[data-win]'); if (!b) return; if (S.playing) setPlaying(false); setWin(b.dataset.win); });
 $('#speed').addEventListener('change', e => { S.speed = +e.target.value; });
 document.addEventListener('keydown', e => { if (e.code === 'Space' && !/INPUT|SELECT|BUTTON/.test(document.activeElement.tagName)) { e.preventDefault(); setPlaying(!S.playing); } });
 const sw = $('#stripWrap');
@@ -1327,7 +1376,7 @@ function setSource(g) {
   $('#src').title = live ? 'Prévisions Open-Meteo' + (g.model === 'auto' ? ' (meilleur modèle disponible pour la zone)' : ' · modèle ' + M0.label + (M0.fb ? ', puis ' + M0.fb + ' au-delà de son échéance ou hors de son domaine' : '')) : "Pas d'accès au réseau ici : un passage de front fictif est simulé. Sur GitHub Pages, la page charge les vraies prévisions.";
   if (live) map.attributionControl.addAttribution('Météo <a href="https://open-meteo.com">Open-Meteo</a>');
 }
-function useGrid(g) { S.g = g; setSource(g); setTime(S.tMs); computeSeries(); updateReadout(); drawStrip(); queueRaster(); if (S.flow) flowOn(); }
+function useGrid(g) { S.g = g; setSource(g); renderDays(); setTime(S.tMs); computeSeries(); updateReadout(); drawStrip(); queueRaster(); if (S.flow) flowOn(); }
 async function maybeRefetch() {
   if (!S.g || S.g.demo || fetching) return;
   const b = map.getBounds(), g = S.g, inside = b.getSouth() >= g.lat0 && b.getNorth() <= g.lat1 && b.getWest() >= g.lon0 && b.getEast() <= g.lon1;
