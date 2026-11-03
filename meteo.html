@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Miguel Météo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -754,6 +759,19 @@ body{background:var(--bg);color:var(--ink);font:14px/1.4 var(--f-display);overfl
 .chip{font:500 12px/1 var(--f-mono);font-variant-numeric:tabular-nums;padding:5px 7px;border-radius:6px;background:color-mix(in srgb,var(--ink) 6%,transparent);display:flex;gap:5px;align-items:center;white-space:nowrap}
 .chip em{font-style:normal;color:var(--muted);font-family:var(--f-display);font-size:11px}
 .chip .arr{display:inline-block;width:11px;height:11px}
+/* encart du point cliqué */
+.leaflet-popup.ptpop .leaflet-popup-content-wrapper{background:var(--panel-solid);color:var(--ink);border-radius:12px;box-shadow:0 6px 22px rgb(0 0 0 / .22);border:1px solid var(--line)}
+.leaflet-popup.ptpop .leaflet-popup-tip{background:var(--panel-solid);box-shadow:none}
+.leaflet-popup.ptpop .leaflet-popup-content{margin:10px 14px 12px;min-width:170px;font:13px/1.35 var(--f-display)}
+.leaflet-popup.ptpop a.leaflet-popup-close-button{color:var(--muted);top:4px;right:4px}
+.pp-name{font-weight:700;font-size:14px;margin:0 18px 2px 0}
+.pp-gps{font:500 11.5px/1.3 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:8px;user-select:all}
+.pp-row{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:baseline}
+.pp-row dt{color:var(--muted);font-size:12px}
+.pp-row dd{margin:0;font:600 13px/1.3 var(--f-mono);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:5px}
+.pp-row dd em{font-style:normal;font-weight:500;color:var(--muted)}
+.pp-row .arr{width:13px;height:13px;color:var(--accent)}
+.pp-when{margin-top:8px;font-size:11.5px;color:var(--muted)}
 #speed{border:1px solid var(--line);background:var(--panel-solid);color:var(--ink);font:500 12px var(--f-mono);border-radius:7px;padding:6px 6px}
 .strip-wrap{position:relative;height:64px;cursor:ew-resize;touch-action:none}
 #strip{position:absolute;inset:0;width:100%;height:100%}
@@ -1135,6 +1153,7 @@ function drawLegend() {
 /* ---------- temps & frise du point ---------- */
 const DF = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' }), HF = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' });
 const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+const COMPASS_FULL = ['Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ouest', 'Ouest', 'Nord-Ouest'];
 function solarElev(lat, lon, ms) {
   const d = ms / 864e5 - 10957.5, g = (357.529 + .98560028 * d) * RAD, q = 280.459 + .98564736 * d;
   const Lm = (q + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * RAD, e = (23.439 - 3.6e-7 * d) * RAD;
@@ -1177,12 +1196,24 @@ function drawStrip() {
   c.beginPath(); c.moveTo(xc - 5, 0); c.lineTo(xc + 5, 0); c.lineTo(xc, 6); c.fill();
 }
 function arrowSvg(u, v) { const deg = Math.atan2(u, v) / RAD; return `<svg class="arr" viewBox="-6 -6 12 12" style="transform:rotate(${deg}deg)"><path d="M0-5L3.5 3.5 0 1.5-3.5 3.5z" fill="currentColor"/></svg>`; }
+let ptPop = null;
+function gpsTxt(lat, lon) { const f = (x, a, b) => `${Math.abs(x).toFixed(5).replace('.', ',')}° ${x >= 0 ? a : b}`; return `${f(lat, 'N', 'S')}, ${f(lon, 'E', 'O')}`; }
+function popHTML(u, v, ws, gu, from, t2) {
+  const p = S.pt, deg = Math.round((Math.atan2(-u, -v) / RAD + 360) % 360), esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  return `<div class="pp-name">${/°/.test(p.name) ? 'Point choisi' : esc(p.name)}</div><div class="pp-gps" title="Position GPS">${gpsTxt(p.lat, p.lon)}</div>` +
+    `<dl class="pp-row"><dt>Température</dt><dd>${t2.toFixed(1).replace('.', ',')} <em>°C</em></dd>` +
+    `<dt>Vent</dt><dd>${arrowSvg(u, v)}${Math.round(ws)} <em>km/h</em></dd>` +
+    `<dt>Direction</dt><dd>${COMPASS_FULL[COMPASS.indexOf(from)]} <em>${deg}°</em></dd>` +
+    `<dt>Rafales</dt><dd>${Math.round(gu)} <em>km/h</em></dd></dl>` +
+    `<div class="pp-when">${DF.format(new Date(S.tMs))} · ${HF.format(new Date(Math.round(S.tMs / 600e3) * 600e3))}</div>`;
+}
 function updateReadout() {
   const f = sampler(S.g), x = th(), p = S.pt, u = f('u', p.lat, p.lon, x), v = f('v', p.lat, p.lon, x), ws = f('ws', p.lat, p.lon, x), gu = f('gust', p.lat, p.lon, x);
   const from = COMPASS[Math.round(((Math.atan2(-u, -v) / RAD + 360) % 360) / 45) % 8], pr = f('pr', p.lat, p.lon, x), cc = f('cc', p.lat, p.lon, x), t2 = f('t2', p.lat, p.lon, x);
   const n1 = v => v.toFixed(1).replace('.', ',');
   $('#ptVals').innerHTML = `<span class="chip">${arrowSvg(u, v)}${Math.round(ws)} <em>km/h ${from}</em></span><span class="chip"><em>rafales</em> ${Math.round(gu)}</span>` +
     `<span class="chip">${pr < .05 ? '0' : n1(pr)} <em>mm/h</em></span><span class="chip">${Math.round(cc)} <em>% nuages</em></span><span class="chip">${n1(t2)} <em>°C</em></span>`;
+  if (ptPop && map.hasLayer(ptPop)) ptPop.setContent(popHTML(u, v, ws, gu, from, t2));
   const dt = new Date(S.tMs); $('#whenDay').textContent = DF.format(dt) + (Math.abs(S.tMs - Date.now()) < 1800e3 ? ' · maintenant' : '');
   $('#whenHour').textContent = HF.format(new Date(Math.round(S.tMs / 600e3) * 600e3));
 }
@@ -1242,7 +1273,13 @@ const sw = $('#stripWrap');
 const scrub = e => { const r = strip.getBoundingClientRect(), f = clamp((e.clientX - r.left - INSET) / (r.width - 2 * INSET), 0, 1); setTime(Math.round((startMs() + f * (endMs() - startMs())) / HOUR) * HOUR); };
 sw.addEventListener('pointerdown', e => { if (S.playing) setPlaying(false); sw.setPointerCapture(e.pointerId); scrub(e); });
 sw.addEventListener('pointermove', e => { if (sw.hasPointerCapture(e.pointerId)) scrub(e); });
-map.on('click', e => setPoint(e.latlng.lat, e.latlng.lng, nearestCity(e.latlng)));
+map.on('click', e => {
+  setPoint(e.latlng.lat, e.latlng.lng, nearestCity(e.latlng));
+  if (!ptPop) ptPop = L.popup({ className: 'ptpop', autoPan: true, maxWidth: 260, closeOnClick: false });
+  const top = document.querySelector('.top'), mr = map.getContainer().getBoundingClientRect(), tb = top ? top.getBoundingClientRect().bottom - mr.top : 0;
+  ptPop.options.autoPanPaddingTopLeft = L.point(20, Math.max(20, tb + 12)); ptPop.options.autoPanPaddingBottomRight = L.point(20, 20);
+  ptPop.setLatLng(e.latlng).openOn(map); updateReadout();
+});
 map.on('move', queueRaster);
 map.on('movestart zoomstart', flowHide);
 map.on('zoomend', drawCities);
