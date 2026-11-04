@@ -378,13 +378,23 @@ section{margin-top:0}
 .tabbar button[aria-current="page"]{color:var(--accent-ink)}
 .tbrand{display:none}
 @media (max-width:899px){
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(8px + env(safe-area-inset-bottom))}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(8px + env(safe-area-inset-bottom))}
   .tabbar[hidden]{display:none}
   .tabbar .tmenu{display:none}
   .tabbar button{min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.74rem;font-weight:600}
   .tabbar .ti{padding:4px 12px;border-radius:999px;display:flex}
   .tabbar button[aria-current="page"]{font-weight:750}
   .tabbar button[aria-current="page"] .ti{background:var(--accent-soft)}
+  .tabbar .tl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media (max-width:430px){
+  .tabbar{padding-left:2px;padding-right:2px}
+  .tabbar button{font-size:.66rem;letter-spacing:-.01em;padding:0}
+  .tabbar .ti{padding:4px 10px}
+}
+@media (max-width:360px){
+  .tabbar button{font-size:.58rem}
+  .tabbar .ti{padding:4px 8px}
   body.has-tabs .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
   body.has-tabs .newver{bottom:calc(84px + env(safe-area-inset-bottom))}
 }
@@ -492,6 +502,26 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
 .tform label.chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
 .tform label.chk input{width:auto}
 .tform .tbtns{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.tform h4{margin:6px 0 -4px;font-size:.9rem}
+.tform h4:first-child{margin-top:0}
+.trow{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.trow .kick{min-width:4.5em}
+.trow .seg2{margin-top:0}
+.tchips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.tchip{min-height:36px;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:0 12px;font:inherit;font-size:.86rem;font-weight:600;color:var(--muted);cursor:pointer}
+.tchip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+.tchip.add{border-style:dashed;color:var(--accent-ink)}
+.tmname{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tmname input{flex:1 1 180px;font:inherit;font-size:.92rem;color:var(--ink);border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:.5rem .6rem;min-width:0}
+.tmname .tmeta{flex-basis:100%;margin:0}
+.tmlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tmlist li{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:12px;padding:8px 10px}
+.tmlist li div{flex:1;min-width:0}
+.tmlist b{display:block;font-size:.9rem;color:var(--ink)}
+.tmlist span{font-size:.8rem;color:var(--muted)}
+.toolsub{margin:0 0 12px;color:var(--muted)}
+.toolgrid{display:grid;gap:0 16px;align-items:start}
+@media (min-width:900px){ .toolgrid{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))} }
 
 /* Calendrier : bascule, semaine en liste */
 .seg2{display:inline-flex;background:var(--surface-2);border-radius:12px;padding:3px}
@@ -602,6 +632,7 @@ dialog{border-radius:20px}
   <button data-view="miguel"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><span class="tl">Miguel</span></button>
   <button data-view="meteo"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.6-8 5.5 5.5 0 0 1 10.6 1.5A3.3 3.3 0 0 1 17 18z"/><path d="M3 21h4M11 21h10"/></svg></span><span class="tl">Météo</span></button>
   <button data-view="prog"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="tl">Progrès</span></button>
+  <button data-view="outils"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span><span class="tl">Outils</span></button>
   <button class="tmenu" id="sidemenu" aria-haspopup="dialog"><span class="av" id="sideav">?</span><span class="tl">Mon menu</span></button>
 </nav>
 <div class="wrap">
@@ -661,12 +692,6 @@ dialog{border-radius:20px}
             <div class="ggrid" id="ggrid"></div>
           </div>
           <div class="pcard" id="weekstrip"></div>
-          <div class="pcard tirecard" id="tirecard">
-            <div class="cardhead"><h3>Pression des pneus</h3><button class="more" id="tireset" type="button" aria-expanded="false" aria-controls="tireform">Régler ›</button></div>
-            <div id="tiretop"></div>
-            <div id="tireres" aria-live="polite"></div>
-            <div class="mform tform" id="tireform" hidden></div>
-          </div>
         </div>
       </div>
     </section>
@@ -771,6 +796,19 @@ dialog{border-radius:20px}
           <button class="iconbtn sm" id="htoggle" aria-expanded="true" aria-controls="hgrid" aria-label="Replier la santé">▴</button>
         </div>
         <div class="hgrid" id="hgrid"></div>
+      </div>
+    </section>
+
+    <section class="view" data-view="outils" aria-labelledby="h-outils" hidden>
+      <h2 id="h-outils" class="vh">Outils</h2>
+      <p class="sub toolsub">Les petits outils pratiques pour préparer tes sorties.</p>
+      <div class="toolgrid">
+      <div class="pcard tirecard" id="tirecard">
+        <div class="cardhead"><h3>Pression des pneus</h3><button class="more" id="tireset" type="button" aria-expanded="false" aria-controls="tireform">Régler ›</button></div>
+        <div id="tiretop"></div>
+        <div id="tireres" aria-live="polite"></div>
+        <div class="mform tform" id="tireform" hidden></div>
+      </div>
       </div>
     </section>
 
@@ -2766,8 +2804,8 @@ function renderMissing(list){
 }
 /* ---------- Refonte : 4 vues (Aujourd'hui, Calendrier, Miguel, Progrès) ---------- */
 // Barre du bas sur téléphone, menu latéral sur ordinateur. Vue gardée dans l'adresse (#today…) et localStorage cm-view.
-const VIEWS = ['today', 'cal', 'miguel', 'meteo', 'prog'];
-const VIEW_TITLE = { cal: 'Calendrier', miguel: 'Miguel', meteo: 'Météo', prog: 'Progrès' };
+const VIEWS = ['today', 'cal', 'miguel', 'meteo', 'prog', 'outils'];
+const VIEW_TITLE = { cal: 'Calendrier', miguel: 'Miguel', meteo: 'Météo', prog: 'Progrès', outils: 'Outils' };
 let curView = 'today';
 function setView(v, keepScroll){
   if (!VIEWS.includes(v)) v = 'today';
@@ -2958,17 +2996,30 @@ function gpPressure(o){
 const fmtBar = v => v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const toPsi = v => Math.round(v * 14.5038);
 
-// Réglages (doc « reglages », clé pneus) : { cur, pilote (kg, vide = poids Garmin), meteo, velos: [ { id, nom, velo, largeur, jante, type, carcasse, priorite, charge, surface, hookless, max } ] }.
+// Réglages (doc « reglages », clé pneus) : { cur, pilote (kg, vide = poids Garmin), meteo,
+//   velos: [ { id, nom, velo, largeur, jante, type, carcasse, priorite, charge, surface, hookless, max } ],
+//   montages: [ { id, nom, largeur, jante, type, carcasse, hookless, max } ] }.
+// Un montage = les champs du pneu et de la roue (MONT_KEYS), enregistré sous un nom et appliqué au vélo choisi.
 const TIRE_BIKE_DEF = { nom: 'Vélo de route', velo: 9, largeur: 28, jante: 19, type: 'tubetype', carcasse: 'standard', priorite: 'equilibre', charge: 'neutre', surface: 'route', hookless: false, max: null };
-const TIRE = { open: false, timer: null };
+const MONT_KEYS = ['largeur', 'jante', 'type', 'carcasse', 'hookless', 'max'];
+const TIRE = { open: false, timer: null, naming: false };
 function tires(){
   const r = state.reglages;
   if (!r.pneus || !Array.isArray(r.pneus.velos) || !r.pneus.velos.length) r.pneus = Object.assign({ pilote: null, meteo: 'auto' }, r.pneus || {}, { velos: [Object.assign({ id: 'v1' }, TIRE_BIKE_DEF)], cur: 'v1' });
   const T = r.pneus;
+  if (!Array.isArray(T.montages)) T.montages = [];
   if (!T.velos.some(v => v.id === T.cur)) T.cur = T.velos[0].id;
   return T;
 }
 const curBike = () => { const T = tires(); return Object.assign({}, TIRE_BIKE_DEF, T.velos.find(v => v.id === T.cur)); };
+// Champs du montage, normalisés pour comparer (nombres, max vide = aucun, hookless booléen).
+function montOf(o){
+  const n = x => { const p = Number(x); return Number.isFinite(p) && p > 0 ? p : null; };
+  return { largeur: n(o.largeur), jante: n(o.jante), type: o.type || 'tubetype', carcasse: o.carcasse || 'standard', hookless: !!o.hookless, max: n(o.max) };
+}
+const sameMont = (a, b) => { const x = montOf(a), y = montOf(b); return MONT_KEYS.every(k => x[k] === y[k]); };
+const montSummary = m => { const x = montOf(m); return [(x.largeur || '?')+' mm', optLabel('type', x.type).toLowerCase(), 'jante '+(x.jante || '?')+' mm', x.carcasse !== 'standard' ? 'carcasse '+optLabel('carcasse', x.carcasse).toLowerCase() : '', x.hookless ? 'hookless' : '', x.max ? 'max '+fmtBar(x.max)+' bar' : ''].filter(Boolean).join(' · '); };
+const montDefaultName = b => { const x = montOf(b); return (x.largeur || '')+' mm '+optLabel('type', x.type).toLowerCase(); };
 // Poids du pilote : saisi, sinon dernière pesée Garmin, sinon 75 kg.
 function riderWeight(){
   const T = tires();
@@ -2977,7 +3028,7 @@ function riderWeight(){
   if (w && w.last) return { kg: w.last, src: 'Garmin '+relDay(w.lastDate) };
   return { kg: 75, src: 'par défaut' };
 }
-// Météo du jour : humide s'il est prévu au moins 1 mm de pluie, un risque ≥ 60 % ou un code pluie / neige / orage.
+// Météo du jour : humide s'il est prévu au moins 1 mm de pluie, un risque ≥ 60 % ou un code pluie / averses / orage.
 function tireWeather(){
   const T = tires();
   if (T.meteo === 'sec' || T.meteo === 'humide') return { m: T.meteo, why: 'choisi' };
@@ -2996,8 +3047,18 @@ function tireCalc(){
 const optLabel = (k, v) => (TIRE_OPTS[k].find(o => o[0] === v) || [, v])[1];
 function renderTire(){
   if (!state.user || !$('tirecard')) return;
-  const T = tires(), b = curBike();
-  $('tiretop').innerHTML = (T.velos.length > 1 ? '<div class="seg2" role="group" aria-label="Vélo">'+T.velos.map(v => '<button type="button" data-tbike="'+esc(v.id)+'" aria-pressed="'+(v.id === T.cur)+'">'+esc(v.nom || 'Vélo')+'</button>').join('')+'</div>' : '')
+  const T = tires(), b = curBike(), match = T.montages.find(m => sameMont(m, b));
+  const bikes = T.velos.length > 1 ? '<div class="trow"><span class="kick">Vélo</span><div class="seg2" role="group" aria-label="Vélo">'+T.velos.map(v => '<button type="button" data-tbike="'+esc(v.id)+'" aria-pressed="'+(v.id === T.cur)+'">'+esc(v.nom || 'Vélo')+'</button>').join('')+'</div></div>' : '';
+  let mont = '<div class="trow"><span class="kick">Montage</span><div class="tchips">'
+    + T.montages.map(m => '<button type="button" class="tchip" data-tmont="'+esc(m.id)+'" aria-pressed="'+(match === m)+'" title="'+esc(montSummary(m))+'">'+esc(m.nom)+'</button>').join('')
+    + (match || TIRE.naming ? '' : '<button type="button" class="tchip add" id="tmsave">+ Enregistrer ce montage</button>')
+    + '</div></div>';
+  const typed = TIRE.naming && $('tmname') ? $('tmname').value : null;
+  if (TIRE.naming) mont += '<form class="tmname" id="tmform"><label class="vh" for="tmname">Nom du montage</label><input type="text" id="tmname" maxlength="40" placeholder="Ex. GP5000 28 tubeless" value="'+esc(typed != null ? typed : montDefaultName(b))+'" enterkeyhint="done">'
+    + '<button class="btn primary" type="submit">Enregistrer</button><button class="btn" type="button" id="tmcancel">Annuler</button>'
+    + '<p class="tmeta">'+esc(montSummary(b))+'</p></form>';
+  else if (!match) mont += '<p class="tmeta">Montage actuel : '+esc(montSummary(b))+'</p>';
+  $('tiretop').innerHTML = bikes + mont
     + '<div class="seg2 tsurf" role="group" aria-label="Surface">'+TIRE_OPTS.surface.map(([v, l]) => '<button type="button" data-tsurf="'+v+'" aria-pressed="'+(b.surface === v)+'">'+l+'</button>').join('')+'</div>';
   renderTireRes();
   if (TIRE.open && !$('tireform').innerHTML) renderTireForm();
@@ -3021,17 +3082,22 @@ function renderTireForm(){
   const T = tires(), b = curBike(), rw = riderWeight();
   const sel = (k, v, lab) => '<label>'+lab+'<select data-tf="'+k+'">'+TIRE_OPTS[k].map(([o, l]) => '<option value="'+o+'"'+(o === v ? ' selected' : '')+'>'+l+'</option>').join('')+'</select></label>';
   const numIn = (k, v, lab, min, max, step, ph) => '<label>'+lab+'<input type="number" data-tf="'+k+'" value="'+(v == null || v === '' ? '' : v)+'" min="'+min+'" max="'+max+'" step="'+step+'" inputmode="decimal"'+(ph ? ' placeholder="'+esc(ph)+'"' : '')+'></label>';
-  $('tireform').innerHTML = (T.velos.length > 1 ? '<label class="wide">Vélo réglé<select data-tf="cur">'+T.velos.map(v => '<option value="'+esc(v.id)+'"'+(v.id === T.cur ? ' selected' : '')+'>'+esc(v.nom || 'Vélo')+'</option>').join('')+'</select></label>' : '')
+  $('tireform').innerHTML = '<h4 class="wide">Le vélo</h4>'
+    + (T.velos.length > 1 ? '<label class="wide">Vélo réglé<select data-tf="cur">'+T.velos.map(v => '<option value="'+esc(v.id)+'"'+(v.id === T.cur ? ' selected' : '')+'>'+esc(v.nom || 'Vélo')+'</option>').join('')+'</select></label>' : '')
     + '<label class="wide">Nom du vélo<input type="text" data-tf="nom" maxlength="40" value="'+esc(b.nom || '')+'"></label>'
-    + numIn('pilote', T.pilote, 'Mon poids (kg) <small>vide = dernière pesée Garmin</small>', 35, 160, 0.1, rw.src.startsWith('Garmin') ? nf1.format(rw.kg)+' (Garmin)' : '')
     + numIn('velo', b.velo, 'Vélo chargé (kg) <small>sacoches, bidons compris</small>', 5, 60, 0.5)
+    + sel('charge', b.charge, 'Répartition de charge')
+    + sel('priorite', b.priorite, 'Priorité')
+    + '<h4 class="wide">Montage des pneus</h4>'
     + numIn('largeur', b.largeur, 'Largeur du pneu mesurée (mm)', 23, 65, 1)
     + numIn('jante', b.jante, 'Largeur interne de jante (mm)', 13, 35, 1)
     + sel('type', b.type, 'Type de pneu') + sel('carcasse', b.carcasse, 'Carcasse')
-    + sel('priorite', b.priorite, 'Priorité') + sel('charge', b.charge, 'Répartition de charge')
-    + sel('meteo', T.meteo || 'auto', 'Météo')
     + numIn('max', b.max, 'Limite max connue (bar) <small>pneu, jante ou roue</small>', 1, 10, 0.1, 'aucune')
-    + '<label class="chk wide"><input type="checkbox" data-tf="hookless"'+(b.hookless ? ' checked' : '')+'> Jante sans crochet (hookless)</label>'
+    + '<label class="chk"><input type="checkbox" data-tf="hookless"'+(b.hookless ? ' checked' : '')+'> Jante sans crochet (hookless)</label>'
+    + '<h4 class="wide">Toi et la météo</h4>'
+    + numIn('pilote', T.pilote, 'Mon poids (kg) <small>vide = dernière pesée Garmin</small>', 35, 160, 0.1, rw.src.startsWith('Garmin') ? nf1.format(rw.kg)+' (Garmin)' : '')
+    + sel('meteo', T.meteo || 'auto', 'Météo')
+    + (T.montages.length ? '<h4 class="wide">Mes montages enregistrés</h4><ul class="tmlist wide">'+T.montages.map(m => '<li><div><b>'+esc(m.nom)+'</b><span>'+esc(montSummary(m))+'</span></div><button class="btn" type="button" data-tmdel="'+esc(m.id)+'">Supprimer</button></li>').join('')+'</ul>' : '')
     + '<div class="tbtns"><button class="btn" type="button" id="tireadd">Ajouter un vélo</button>'+(T.velos.length > 1 ? '<button class="btn" type="button" id="tiredel">Supprimer ce vélo</button>' : '')+'</div>'
     + '<p class="saved wide" id="tiresave"></p>';
 }
@@ -3050,9 +3116,20 @@ $('tireset').addEventListener('click', () => {
   if (TIRE.open) renderTireForm();
 });
 $('tirecard').addEventListener('click', e => {
-  const T = tires(), bk = e.target.closest('[data-tbike]'), sf = e.target.closest('[data-tsurf]');
-  if (bk){ T.cur = bk.dataset.tbike; renderTire(); if (TIRE.open) renderTireForm(); saveTires(); return; }
+  const T = tires(), bk = e.target.closest('[data-tbike]'), sf = e.target.closest('[data-tsurf]'), mt = e.target.closest('[data-tmont]'), md = e.target.closest('[data-tmdel]');
+  if (bk){ T.cur = bk.dataset.tbike; TIRE.naming = false; renderTire(); if (TIRE.open) renderTireForm(); saveTires(); return; }
   if (sf){ setBikeField('surface', sf.dataset.tsurf); renderTire(); saveTires(); return; }
+  if (mt){
+    const m = T.montages.find(x => x.id === mt.dataset.tmont); if (!m) return;
+    const x = montOf(m); for (const k of MONT_KEYS) setBikeField(k, x[k]);
+    TIRE.naming = false; renderTire(); if (TIRE.open) renderTireForm(); saveTires(); return;
+  }
+  if (md){
+    const m = T.montages.find(x => x.id === md.dataset.tmdel); if (!m || !confirm('Supprimer le montage « '+m.nom+' » ?')) return;
+    T.montages = T.montages.filter(x => x !== m); renderTire(); renderTireForm(); saveTires(); return;
+  }
+  if (e.target.id === 'tmsave'){ TIRE.naming = true; renderTire(); const n = $('tmname'); if (n){ n.focus(); n.select(); } return; }
+  if (e.target.id === 'tmcancel'){ TIRE.naming = false; renderTire(); return; }
   if (e.target.id === 'tireadd'){
     const id = 'v'+Date.now().toString(36);
     T.velos.push(Object.assign({}, TIRE_BIKE_DEF, { id, nom: 'Gravel', largeur: 40, jante: 23, type: 'tubeless', surface: 'blancs' })); T.cur = id;
@@ -3063,19 +3140,29 @@ $('tirecard').addEventListener('click', e => {
     T.velos = T.velos.filter(v => v.id !== T.cur); T.cur = T.velos[0].id; renderTire(); renderTireForm(); saveTires();
   }
 });
+// Enregistrer le montage du vélo choisi sous un nom (un nom déjà pris remplace l'ancien montage).
+$('tirecard').addEventListener('submit', e => {
+  if (e.target.id !== 'tmform') return;
+  e.preventDefault();
+  const T = tires(), b = curBike(), nom = ($('tmname').value || '').trim().slice(0, 40) || montDefaultName(b);
+  const m = Object.assign({ id: 'm'+Date.now().toString(36), nom }, montOf(b));
+  const i = T.montages.findIndex(x => x.nom.toLowerCase() === nom.toLowerCase());
+  if (i >= 0){ m.id = T.montages[i].id; T.montages[i] = m; } else T.montages.push(m);
+  TIRE.naming = false; renderTire(); if (TIRE.open) renderTireForm(); saveTires();
+});
 $('tireform').addEventListener('input', e => {
   const f = e.target.dataset.tf; if (!f) return;
   const T = tires(), v = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
   const n = x => { const p = parseFloat(String(x).replace(',', '.')); return Number.isFinite(p) ? p : null; };
-  if (f === 'cur'){ T.cur = v; renderTire(); renderTireForm(); saveTires(); return; }
+  if (f === 'cur'){ T.cur = v; TIRE.naming = false; renderTire(); renderTireForm(); saveTires(); return; }
   if (f === 'pilote') T.pilote = n(v) > 0 ? n(v) : null;
   else if (f === 'meteo') T.meteo = v;
   else if (f === 'nom') setBikeField('nom', String(v).trim().slice(0, 40) || 'Vélo');
   else if (f === 'hookless') setBikeField('hookless', !!v);
   else if (['velo', 'largeur', 'jante', 'max'].includes(f)){ const x = n(v); if (x == null && f !== 'max') return; setBikeField(f, x); }
   else setBikeField(f, v);
-  if (f === 'nom'){ renderTire(); const o = $('tireform').querySelector('[data-tf="cur"] option:checked'); if (o) o.textContent = curBike().nom; }
-  else renderTireRes();
+  if (f === 'nom'){ const o = $('tireform').querySelector('[data-tf="cur"] option:checked'); if (o) o.textContent = curBike().nom; }
+  renderTire();
   saveTires();
 });
 function renderWeekStrip(){
@@ -3373,7 +3460,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-04-pneus-1';
+const APP_VERSION = '2026-11-04-outils-1';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
