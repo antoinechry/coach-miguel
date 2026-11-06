@@ -3332,13 +3332,32 @@ async function showApp(user){
   loadWellness();
 }
 
+// App iPhone : la connexion reste ouverte 7 jours après la saisie du mot de passe, puis on le redemande.
+// (Sur le site, inchangé : connexion gardée tant qu'on ne se déconnecte pas.)
+const LOGIN_DAYS = 7, LOGIN_KEY = 'cm-login-at';
+function markLogin(){ try { localStorage.setItem(LOGIN_KEY, String(Date.now())); } catch(_){} }
+function loginExpired(){
+  if (!IS_APP) return false;
+  let t = 0; try { t = +localStorage.getItem(LOGIN_KEY) || 0; } catch(_){}
+  if (!t){ markLogin(); return false; } // session ouverte avant cette règle : les 7 jours partent d'aujourd'hui
+  return Date.now() - t > LOGIN_DAYS * 864e5;
+}
+async function expireLogin(){
+  try { localStorage.removeItem(LOGIN_KEY); } catch(_){}
+  await sb.auth.signOut();
+  state.user = null; showAuth();
+  setMsg($('authmsg'), 'Connexion ouverte depuis 7 jours : entre à nouveau ton mot de passe.');
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user && loginExpired()) expireLogin(); });
+
 async function init(){
   if (!initSupabase()){
     $('state').textContent = 'Le chargement de la base a échoué. Recharge la page.';
     return;
   }
   const { data } = await sb.auth.getSession();
-  if (data && data.session) await showApp(data.session.user);
+  if (data && data.session && loginExpired()) await expireLogin();
+  else if (data && data.session) await showApp(data.session.user);
   else showAuth();
   sb.auth.onAuthStateChange((ev, session) => {
     if (session && (!state.user || state.user.id !== session.user.id)) showApp(session.user);
@@ -3348,7 +3367,7 @@ async function init(){
   });
 }
 
-$('logout').addEventListener('click', async () => { if ($('profdlg').open) $('profdlg').close(); await sb.auth.signOut(); });
+$('logout').addEventListener('click', async () => { if ($('profdlg').open) $('profdlg').close(); try { localStorage.removeItem(LOGIN_KEY); } catch(_){} await sb.auth.signOut(); });
 
 const AUTH_ERR = m => /invalid login credentials/i.test(m) ? 'E-mail ou mot de passe incorrect.'
   : /email not confirmed/i.test(m) ? 'Adresse e-mail pas encore confirmée : ouvre le lien de confirmation reçu par e-mail.'
@@ -3359,7 +3378,7 @@ $('pwform').addEventListener('submit', async e => {
   const { error } = await sb.auth.signInWithPassword({ email: $('pwemail').value.trim(), password: $('pwpass').value });
   $('pwgo').disabled = false;
   if (error) setMsg($('authmsg'), AUTH_ERR(error.message), true);
-  else { setMsg($('authmsg'), ''); $('pwpass').value = ''; }
+  else { markLogin(); setMsg($('authmsg'), ''); $('pwpass').value = ''; }
 });
 $('pwforgot').addEventListener('click', async () => {
   const email = $('pwemail').value.trim();
@@ -3467,7 +3486,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-06-app-ios-1';
+const APP_VERSION = '2026-11-06-app-ios-2';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
