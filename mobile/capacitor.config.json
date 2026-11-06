@@ -1,0 +1,11 @@
+{
+  "appId": "fr.beyondthetrack.coachmiguel",
+  "appName": "Coach Miguel",
+  "webDir": "www",
+  "backgroundColor": "#16221B",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#16221B",
+    "limitsNavigationsToAppBoundDomains": false
+  }
+}
