@@ -66,6 +66,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Coach Miguel enregistre les visuels et vidéos de l'agenda dans ta photothèque pour les publier.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Coach Miguel enregistre les visuels et vidéos de l'agenda dans ta photothèque pour les publier.</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 </dict>
