@@ -3431,9 +3431,11 @@ const AGENDA = (() => {
   }
   function renderAgenda(){
     const from = ST.past ? '0000' : iso(monday(new Date())), tod = todayISO();
-    const posts = DATA.posts.filter(p => visible(p) && p.date >= from), stories = DATA.stories.filter(s => visible(s) && s.date >= from);
+    // Une publication passée et cochée « Publié » quitte la timeline (elle reste visible avec « Publications passées »).
+    const hide = (x, key) => !ST.past && x.date < tod && done[key];
+    const posts = DATA.posts.filter(p => visible(p) && p.date >= from && !hide(p, p.id)), stories = DATA.stories.filter(s => visible(s) && s.date >= from && !hide(s, skey(s)));
     const dates = [...new Set([...posts.map(p => p.date), ...stories.map(s => s.date)])].sort();
-    if (!dates.length){ g('agmain').innerHTML = '<p class="agempty">Aucune publication à venir pour ce filtre.</p>'; return; }
+    if (!dates.length){ g('agmain').innerHTML = '<p class="agempty">Rien à publier pour ce filtre. Les publications passées déjà publiées sont masquées : coche « Publications passées » pour les revoir.</p>'; return; }
     const weeks = new Map();
     dates.forEach(d => { const k = iso(monday(pd(d))); if (!weeks.has(k)) weeks.set(k, []); weeks.get(k).push(d); });
     let h = '';
@@ -4305,7 +4307,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-agenda-supabase';
+const APP_VERSION = '2026-11-08-agenda-masque';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
