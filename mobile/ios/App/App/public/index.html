@@ -526,7 +526,25 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
 .tmlist li div{flex:1;min-width:0}
 .tmlist b{display:block;font-size:.9rem;color:var(--ink)}
 .tmlist span{font-size:.8rem;color:var(--muted)}
-.toolsub{margin:0 0 12px;color:var(--muted)}
+.toolsub{margin:0 0 16px;color:var(--muted)}
+/* Outils = lanceur de petites apps (08/11/2026) : une tuile par app, l'app s'ouvre en plein écran avec « ‹ Outils » */
+.applaunch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px 10px;max-width:640px}
+@media (min-width:900px){ .applaunch{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));max-width:none} }
+.apptile{border:none;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--ink);font:inherit;-webkit-tap-highlight-color:transparent}
+.apptile .aico{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.12);transition:transform .12s}
+.apptile:active .aico{transform:scale(.93)}
+.apptile .aico svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.apptile .alab{font-size:.78rem;font-weight:600;line-height:1.2;text-align:center;max-width:100%;overflow-wrap:anywhere}
+.apptile:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:12px}
+.toolbar{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.toolback{white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--accent-ink);border-radius:999px;min-height:40px;padding:0 14px;font:inherit;font-weight:650;cursor:pointer}
+.tooltitle{margin:0;font-size:1.15rem}
+.toolpane .tirecard .cardhead h3{display:none}
+.toolpane .tirecard .cardhead{justify-content:flex-end}
+.toolext{margin-left:auto;font-size:.85rem;color:var(--accent-ink);white-space:nowrap}
+.toolframe{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);height:calc(100dvh - 230px - env(safe-area-inset-bottom));min-height:440px}
+.toolframe iframe{display:block;width:100%;height:100%;border:0}
+@media (max-width:899px){ .toolframe{height:calc(100dvh - 210px - env(safe-area-inset-top) - env(safe-area-inset-bottom))} }
 .toolgrid{display:grid;gap:0 16px;align-items:start}
 @media (min-width:900px){ .toolgrid{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))} }
 
@@ -808,7 +826,12 @@ dialog{border-radius:20px}
 
     <section class="view" data-view="outils" aria-labelledby="h-outils" hidden>
       <h2 id="h-outils" class="vh">Outils</h2>
-      <p class="sub toolsub">Les petits outils pratiques pour préparer tes sorties.</p>
+      <div id="toolhome">
+        <p class="sub toolsub">Tes petites apps pour te faciliter la vie. Touche-en une pour l'ouvrir.</p>
+        <div class="applaunch" id="applaunch"></div>
+      </div>
+      <div class="toolpane" data-tool="pneus" hidden>
+      <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Pression des pneus</h3></div>
       <div class="toolgrid">
       <div class="pcard tirecard" id="tirecard">
         <div class="cardhead"><h3>Pression des pneus</h3><button class="more" id="tireset" type="button" aria-expanded="false" aria-controls="tireform">Régler ›</button></div>
@@ -816,6 +839,11 @@ dialog{border-radius:20px}
         <div id="tireres" aria-live="polite"></div>
         <div class="mform tform" id="tireform" hidden></div>
       </div>
+      </div>
+      </div>
+      <div class="toolpane" data-tool="agenda" hidden>
+        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Agenda des publications</h3><a class="toolext" href="https://antoinechry.github.io/agenda-miguel/" target="_blank" rel="noopener">Ouvrir à part ↗</a></div>
+        <div class="toolframe"><iframe id="agendaframe" title="Agenda des publications réseaux" loading="lazy" referrerpolicy="no-referrer"></iframe></div>
       </div>
     </section>
 
@@ -2849,10 +2877,39 @@ function initialView(){
 function updateTitle(){
   if (!state.user) return;
   const p = String(me().prenom || '').trim();
-  $('pagetitle').textContent = curView === 'today' ? (p ? 'Bonjour '+p : 'Aujourd\'hui') : VIEW_TITLE[curView];
+  const tl = curView === 'outils' && typeof curTool !== 'undefined' && curTool ? (TOOLS.find(x => x.id === curTool) || {}).name : '';
+  $('pagetitle').textContent = curView === 'today' ? (p ? 'Bonjour '+p : 'Aujourd\'hui') : (tl || VIEW_TITLE[curView]);
   $('state').textContent = curView === 'today' ? cap(longFmt.format(t0)) : '';
 }
-$('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
+$('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (!b) return; if (b.dataset.view === 'outils' && curView === 'outils') openTool(null); setView(b.dataset.view); });
+
+// Outils : lanceur de petites apps. Pour en ajouter une : une entrée dans TOOLS + un <div class="toolpane" data-tool="<id>"> dans la vue Outils.
+const TOOLS = [
+  { id: 'pneus', name: 'Pression pneus', title: 'Pression des pneus', color: '#2A6A5B',
+    icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/>' },
+  { id: 'agenda', name: 'Agenda réseaux', title: 'Agenda des publications', color: '#B8501F', url: 'https://antoinechry.github.io/agenda-miguel/',
+    icon: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15.5l3-2v4l-3-2zM11 13.5h2.5l2.5-1.5v7l-2.5-1.5H11"/>' }
+];
+let curTool = null;
+function renderLauncher(){
+  $('applaunch').innerHTML = TOOLS.map(t => '<button class="apptile" type="button" data-tool-open="'+t.id+'"><span class="aico" style="background:'+t.color+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+t.icon+'</svg></span><span class="alab">'+esc(t.name)+'</span></button>').join('');
+}
+function openTool(id){
+  const t = TOOLS.find(x => x.id === id) || null;
+  curTool = t ? t.id : null;
+  $('toolhome').hidden = !!t;
+  for (const p of document.querySelectorAll('.toolpane')) p.hidden = !t || p.dataset.tool !== t.id;
+  try { localStorage.setItem('cm-tool', curTool || ''); } catch(_){}
+  if (t && t.id === 'pneus' && state.user){ try { renderTire(); } catch(_){} }
+  if (t && t.url){ const f = document.querySelector('.toolpane[data-tool="'+t.id+'"] iframe'); if (f && !f.src) f.src = t.url; }
+  if (curView === 'outils'){ updateTitle(); window.scrollTo(0, 0); }
+}
+renderLauncher();
+document.querySelector('.view[data-view="outils"]').addEventListener('click', e => {
+  const o = e.target.closest('[data-tool-open]'); if (o){ openTool(o.dataset.toolOpen); return; }
+  if (e.target.closest('[data-toolback]')) openTool(null);
+});
+try { const t = localStorage.getItem('cm-tool'); if (t) openTool(t); } catch(_){}
 
 // Raccourcis des cartes : ouvrir une journée (et un onglet), une sortie, une autre vue.
 $('app').addEventListener('click', e => {
@@ -3470,7 +3527,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-mobile-1';
+const APP_VERSION = '2026-11-08-outils-apps-1';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
