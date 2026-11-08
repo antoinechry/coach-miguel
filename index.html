@@ -3313,7 +3313,8 @@ const AGENDA = (() => {
     if (DATA){ render(); show('app'); return; }
     if (booted) return;
     booted = true;
-    const k = ls.get('agenda.key', null);
+    // Clé gardée sur l'appareil, sinon dans les réglages privés (Supabase, derrière la connexion) : le mot de passe n'est demandé qu'une fois pour tous les appareils.
+    const k = ls.get('agenda.key', null) || (state.reglages && state.reglages.agenda && state.reglages.agenda.key) || null;
     if (!k){ show('lock'); return; }
     show('load');
     try {
@@ -3323,7 +3324,7 @@ const AGENDA = (() => {
     } catch(e){
       KEY = null;
       if (e.message === 'nodata'){ g('agerr').textContent = "Aucune donnée publiée pour l'instant."; }
-      else if (e.name === 'OperationError') ls.del('agenda.key');
+      else if (e.name === 'OperationError'){ ls.del('agenda.key'); try { if (state.reglages && state.reglages.agenda){ delete state.reglages.agenda; saveDoc('reglages', state.reglages); } } catch(e2){} }
       else g('agerr').textContent = 'Agenda injoignable (réseau ?). Réessaie.';
       booted = false;
       show('lock');
@@ -3333,7 +3334,9 @@ const AGENDA = (() => {
     try { KEY = await deriveKey(pw); DATA = await loadData(); } catch(e){ KEY = null; DATA = null; throw e; }
     if (remember){
       const raw = await crypto.subtle.exportKey('raw', KEY);
-      ls.set('agenda.key', btoa(String.fromCharCode(...new Uint8Array(raw))));
+      const k = btoa(String.fromCharCode(...new Uint8Array(raw)));
+      ls.set('agenda.key', k);
+      try { if (state.reglages){ state.reglages.agenda = { key: k }; saveDoc('reglages', state.reglages); } } catch(e){}
     }
     show('app'); render();
   }
@@ -3562,7 +3565,8 @@ const AGENDA = (() => {
       finally { btn.disabled = false; btn.textContent = "Ouvrir l'agenda"; }
     });
     g('aglockbtn').addEventListener('click', () => {
-      ls.del('agenda.key'); KEY = null; DATA = null; booted = true; blobCache.clear(); READY.clear();
+      ls.del('agenda.key'); try { if (state.reglages && state.reglages.agenda){ delete state.reglages.agenda; saveDoc('reglages', state.reglages); } } catch(e){}
+      KEY = null; DATA = null; booted = true; blobCache.clear(); READY.clear();
       urlCache.forEach(p => p.then(u => URL.revokeObjectURL(u)).catch(() => {})); urlCache.clear();
       g('agmain').innerHTML = ''; show('lock');
     });
@@ -4273,7 +4277,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-agenda-natif';
+const APP_VERSION = '2026-11-08-agenda-natif-2';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
