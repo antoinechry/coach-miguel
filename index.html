@@ -542,9 +542,98 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
 .tooltitle{margin:0;font-size:1.15rem}
 .toolpane .tirecard .cardhead h3{display:none}
 .toolpane .tirecard .cardhead{justify-content:flex-end}
-.toolext{margin-left:auto;font-size:.85rem;color:var(--accent-ink);white-space:nowrap}
-.toolframe{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);height:calc(100dvh - 230px - env(safe-area-inset-bottom));min-height:440px}
-.toolframe iframe{display:block;width:100%;height:100%;border:0}
+/* Agenda des publications, en natif (08/11/2026) : données chiffrées lues sur antoinechry.github.io/agenda-miguel */
+.toolext{margin-left:auto;font:inherit;font-size:.85rem;color:var(--accent-ink);white-space:nowrap;background:none;border:none;cursor:pointer;text-decoration:underline}
+.aglock{max-width:420px;display:grid;gap:10px}
+.aglock h3{margin:0}.aglock .sub{margin:0}.aglock .msg{margin:0}.aglock .msg:empty{display:none}
+.agfield{display:flex;flex-direction:column;gap:4px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.agfield input{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:.55rem .65rem;min-height:44px;box-sizing:border-box}
+.agchk{display:inline-flex;gap:8px;align-items:center;font-size:.88rem;color:var(--muted);cursor:pointer}
+.agchk input{width:18px;height:18px;accent-color:var(--accent)}
+.agtop{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.agseg{display:inline-flex}
+.agstats{font-size:.85rem;color:var(--muted)}.agstats b{color:var(--accent-ink)}
+.agchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.agchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;min-height:36px;font:inherit;font-size:.85rem;font-weight:650;color:var(--ink);cursor:pointer}
+.agchip .agdot{width:10px;height:10px;border-radius:50%;background:var(--c,var(--muted))}
+.agchip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.agopts{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.agexp{display:flex;gap:6px}.agexp .btn{min-height:36px;padding:.3rem .8rem;font-size:.82rem}
+.ag .agweek{margin-top:22px}
+.ag .agweek h4{margin:0;font-size:1.05rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.ag .agweek h4 small{font-weight:400;font-size:.85rem;color:var(--muted)}
+.ag .agroad{border-left:2px dashed var(--line);margin:12px 0 0 18px;padding-left:24px;display:grid;gap:14px}
+.ag .agday{position:relative;scroll-margin-top:80px}
+.ag .agday::before{content:attr(data-n);position:absolute;left:-43px;top:4px;width:36px;height:36px;border-radius:50%;background:var(--surface);border:2px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:.85rem;color:var(--muted)}
+.ag .agday.today::before{border-color:var(--accent);color:var(--accent-ink)}
+.ag .agdl{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:12px;margin-bottom:8px}
+.ag .agdl em{font-style:normal;color:var(--accent-ink);margin-left:6px}
+.ag .agcard{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:14px;display:grid;grid-template-columns:130px minmax(0,1fr);gap:16px;padding:14px;margin-bottom:10px}
+.ag .agcard.done{opacity:.6}
+.ag .agtb{all:unset;cursor:zoom-in;position:relative;display:block;border-radius:8px;align-self:start}
+.ag .agtb img,.ag .agtb .agph{width:130px;aspect-ratio:4/5;object-fit:cover;border-radius:8px;display:block;background:var(--surface-2)}
+.ag .agtb.tall img,.ag .agtb.tall .agph{aspect-ratio:9/16;width:110px;margin:0 auto}
+.ag .agcount{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.7);color:#fff;font-size:.72rem;font-weight:700;padding:3px 7px;border-radius:4px}
+.ag .agmeta{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.ag .agtime{font-weight:750;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.ag .agtag{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid currentColor;color:var(--muted)}
+.ag .agptag{font-size:.82rem;font-weight:700;color:var(--c)}
+.ag .agcard h5{font-size:1.05rem;line-height:1.2;margin:6px 0 4px}
+.ag .agwhy{color:var(--muted);margin:0 0 8px;font-size:.88rem}
+.ag details{border-top:1px solid var(--line);padding-top:6px}
+.ag summary{cursor:pointer;font-weight:650;font-size:.85rem;color:var(--accent-ink)}
+.ag .agcap{white-space:pre-wrap;font-size:.88rem;background:var(--surface-2);border-radius:8px;padding:10px 12px;margin:8px 0 0;overflow-wrap:anywhere}
+.ag .agact{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.ag .agact .btn{min-height:36px;padding:.3rem .8rem;font-size:.82rem}
+.ag .btn.agdlb{background:var(--c);border-color:var(--c);color:#fff}
+.ag .aghint{font-size:.8rem;color:var(--muted);font-style:italic}
+.ag .agstrip{display:flex;gap:6px;overflow-x:auto;margin:10px 0 4px;padding-bottom:4px}
+.ag .agsl{all:unset;cursor:zoom-in;position:relative;flex:none;line-height:0}
+.ag .agsl img{height:96px;width:auto;min-width:50px;border-radius:4px;background:var(--surface-2)}
+.ag .agsl span{position:absolute;left:3px;bottom:3px;font-size:.66rem;line-height:1;font-weight:700;color:#fff;background:rgba(0,0,0,.55);padding:2px 4px;border-radius:3px}
+.ag .agstories{display:flex;flex-wrap:wrap;gap:8px}
+.ag .agstory{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:.88rem;background:var(--surface)}
+.ag .agstory.done{opacity:.6}
+.ag .agstory .agdot{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.ag .agstchk{margin-left:auto}
+.ag .agstv{display:flex;gap:8px;align-items:center;width:100%;margin-top:4px;flex-wrap:wrap}
+.ag .agstth{border:0;padding:0;background:none;cursor:pointer}
+.ag .agstth img,.ag .agstth video{height:140px;width:auto;aspect-ratio:9/16;object-fit:cover;border-radius:8px;display:block;background:var(--surface-2)}
+.ag .agstl{width:100%;font-size:.8rem;word-break:break-all;opacity:.8}
+.ag .agmus{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;font-size:.8rem;color:var(--muted)}
+.ag .agstory .agmus{flex-basis:100%;margin:0 0 0 20px}
+.ag .agsong{all:unset;cursor:copy;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--ink);background:var(--surface-2);font-size:.8rem}
+.ag .agsong i{font-style:normal;color:var(--muted)}
+.ag .agempty{margin-top:30px;color:var(--muted)}
+.ag .agmhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 10px}
+.ag .agmhead h4{margin:0;font-size:1.15rem;text-transform:capitalize}
+.ag .agmhead .btn{min-width:44px}
+.ag .aggrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.ag .aggrid .agwd{font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:center}
+.ag .agcell{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:88px;padding:5px;display:flex;flex-direction:column;gap:3px;text-align:left;min-width:0;font:inherit;color:var(--ink);cursor:pointer}
+.ag .agcell.out{opacity:.4}.ag .agcell.today{border-color:var(--accent)}
+.ag .agcell .agn{font-weight:700;font-size:.82rem}
+.ag .agcell .agit{font-size:.7rem;line-height:1.25;border-left:3px solid var(--c);padding-left:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){
+  .ag .agcard{grid-template-columns:minmax(0,1fr)}
+  .ag .agtb img,.ag .agtb .agph{width:100%;max-width:260px}
+  .ag .agroad{margin-left:12px;padding-left:20px}
+  .ag .agday::before{left:-37px;width:30px;height:30px;font-size:.75rem}
+  .ag .agcell{min-height:54px;padding:4px}.ag .agcell .agit{font-size:0;height:6px;border-left:0;background:var(--c);border-radius:3px;padding:0}
+}
+.aglb{position:fixed;inset:0;z-index:80;background:rgba(10,12,11,.94);display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));color:#F4F6F2}
+.aglb[hidden]{display:none}
+.aglb-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:700}
+.aglb .btn{background:transparent;border-color:#F4F6F2;color:#F4F6F2}
+.aglb-stage{display:flex;align-items:center;justify-content:center;gap:10px;min-height:0;position:relative}
+.aglb-media{flex:1;height:100%;display:flex;align-items:center;justify-content:center;min-height:0}
+.aglb-media img,.aglb-media video{max-width:min(100%,900px);max-height:100%;object-fit:contain;border-radius:6px}
+.aglb .agnav{font-size:1.4rem;padding:8px 14px}
+.aglb-dots{display:flex;justify-content:center;gap:8px;padding-top:10px}
+.aglb-dots span{width:8px;height:8px;border-radius:50%;background:#5c6660}.aglb-dots span.on{background:#A6D86E}
+@media (max-width:640px){.aglb .agnav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5)}.aglb .agprev{left:0}.aglb .agnext{right:0}}
+.agtoast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:650;font-size:.88rem;z-index:90;max-width:calc(100vw - 32px)}
+.agtoast[hidden]{display:none}
 /* Suivi de colis (08/11/2026) */
 .cxadd h3{margin:0 0 10px}
 .cxgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -555,7 +644,11 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
 #cxnum{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}
 .cxact{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
 .cxact .msg{margin:0}
-.cxsum{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 10px}
+.cxbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:14px 0 10px}
+.cxsum{display:flex;flex-wrap:wrap;gap:6px}
+#cxall{white-space:nowrap}
+#cxallmsg{margin:-4px 0 10px}
+#cxallmsg:empty{display:none}
 .cxlist{display:grid;gap:12px;align-items:start}
 @media (min-width:900px){ .cxlist{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))} }
 .cx{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
@@ -603,7 +696,6 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
   .cx .croute{grid-template-columns:minmax(0,1fr);gap:6px}
   .cx .cev li{grid-template-columns:minmax(0,1fr);gap:0}
 }
-@media (max-width:899px){ .toolframe{height:calc(100dvh - 210px - env(safe-area-inset-top) - env(safe-area-inset-bottom))} }
 .toolgrid{display:grid;gap:0 16px;align-items:start}
 @media (min-width:900px){ .toolgrid{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))} }
 
@@ -900,9 +992,26 @@ dialog{border-radius:20px}
       </div>
       </div>
       </div>
-      <div class="toolpane" data-tool="agenda" hidden>
-        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Agenda des publications</h3><a class="toolext" href="https://antoinechry.github.io/agenda-miguel/" target="_blank" rel="noopener">Ouvrir à part ↗</a></div>
-        <div class="toolframe"><iframe id="agendaframe" title="Agenda des publications réseaux" loading="lazy" referrerpolicy="no-referrer"></iframe></div>
+      <div class="toolpane ag" data-tool="agenda" hidden>
+        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Agenda des publications</h3><button class="toolext" type="button" id="aglockbtn" hidden>Verrouiller</button></div>
+        <form class="pcard aglock" id="aglock" autocomplete="off" hidden>
+          <h3>Agenda des publications</h3>
+          <p class="sub">Contenu chiffré : entre le mot de passe de l'agenda.</p>
+          <label class="agfield">Mot de passe<input type="password" id="agpw" autocomplete="current-password" required></label>
+          <label class="agchk"><input type="checkbox" id="agremember" checked> Se souvenir sur cet appareil</label>
+          <p class="msg" id="agerr" role="alert"></p>
+          <button class="btn primary" type="submit" id="agunlock">Ouvrir l'agenda</button>
+        </form>
+        <p class="msg" id="agload" hidden>Ouverture de l'agenda…</p>
+        <div id="agapp" hidden>
+          <div class="agtop">
+            <div class="seg2 agseg" role="group" aria-label="Vue de l'agenda"><button type="button" data-agview="agenda" aria-pressed="true">Agenda</button><button type="button" data-agview="mois" aria-pressed="false">Mois</button></div>
+            <span class="agstats" id="agstats"></span>
+          </div>
+          <div class="agchips" id="agprojects"></div>
+          <div class="agopts"><label class="agchk"><input type="checkbox" id="agpast"> Publications passées</label><span class="agexp"><button class="btn" type="button" id="agics">Exporter (.ics)</button><button class="btn" type="button" id="agcsv">CSV</button></span></div>
+          <div id="agmain"></div>
+        </div>
       </div>
       <div class="toolpane" data-tool="colis" hidden>
         <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Suivi de colis</h3></div>
@@ -915,7 +1024,8 @@ dialog{border-radius:20px}
           </div>
           <div class="cxact"><button class="btn primary" type="submit" id="cxgo">Ajouter et suivre</button><span class="msg" id="cxmsg" aria-live="polite"></span></div>
         </form>
-        <div class="cxsum" id="cxsum"></div>
+        <div class="cxbar"><div class="cxsum" id="cxsum"></div><button class="btn" type="button" id="cxall">↻ Tout actualiser</button></div>
+        <p class="msg" id="cxallmsg" aria-live="polite"></p>
         <div class="cxlist" id="cxlist"></div>
         <details class="cxdone" id="cxdonewrap" hidden><summary id="cxdonesum">Colis récupérés</summary><div class="cxlist" id="cxdone"></div></details>
         <p class="sub cxfoot">« Actualiser » demande à Claude de lire le suivi du transporteur (≈ 2 à 6 centimes). Certains sites de suivi ne se laissent pas lire : le bouton « Suivre » ouvre toujours la page officielle.</p>
@@ -925,6 +1035,12 @@ dialog{border-radius:20px}
   </div>
 </div>
 </div>
+<div class="aglb" id="aglb" hidden role="dialog" aria-modal="true" aria-label="Aperçu du visuel">
+  <div class="aglb-top"><span id="aglb-title"></span><span id="aglb-num"></span><button class="btn" type="button" id="aglb-close">Fermer ✕</button></div>
+  <div class="aglb-stage"><button class="btn agnav agprev" type="button" id="aglb-prev" aria-label="Précédent">‹</button><div class="aglb-media" id="aglb-media"></div><button class="btn agnav agnext" type="button" id="aglb-next" aria-label="Suivant">›</button></div>
+  <div class="aglb-dots" id="aglb-dots"></div>
+</div>
+<div class="agtoast" id="agtoast" hidden></div>
 <button class="newver" id="newver" hidden>Nouvelle version disponible · Recharger</button>
 
 <dialog id="profdlg" class="menu" aria-labelledby="proftitle">
@@ -3082,6 +3198,20 @@ async function refreshColis(id){
   } catch(e){ setMsg($('cxmsg'), e.message || 'La recherche a échoué.', true); }
   delete CX.busy[id]; renderColis();
 }
+// « Tout actualiser » : un colis après l'autre (les colis récupérés ne sont pas relancés).
+async function refreshAllColis(){
+  const ids = cxData().items.filter(c => !c.done && !CX.busy[c.id]).map(c => c.id);
+  if (!ids.length || CX.all) return;
+  CX.all = true; $('cxall').disabled = true;
+  for (let i = 0; i < ids.length; i++){
+    $('cxall').textContent = '↻ '+(i+1)+' / '+ids.length+'…';
+    setMsg($('cxallmsg'), 'Claude relit le suivi de tes '+ids.length+' colis, un par un (≈ '+ids.length*4+' centimes au total).');
+    await refreshColis(ids[i]);
+  }
+  CX.all = false; $('cxall').disabled = false; $('cxall').textContent = '↻ Tout actualiser';
+  setMsg($('cxallmsg'), 'Tous les colis ont été relus le '+cxWhen(new Date().toISOString())+'.');
+}
+$('cxall').addEventListener('click', refreshAllColis);
 $('cxform').addEventListener('submit', e => {
   e.preventDefault();
   const num = $('cxnum').value.replace(/\s+/g, '').toUpperCase();
@@ -3098,7 +3228,7 @@ document.querySelector('.toolpane[data-tool="colis"]').addEventListener('click',
   const items = cxData().items, find = id => items.find(x => x.id === id);
   if (t.dataset.cxref){ setMsg($('cxmsg'), ''); refreshColis(t.dataset.cxref); return; }
   if (t.dataset.cxcopy){ const v = t.dataset.cxcopy; try { navigator.clipboard.writeText(v).then(() => { t.textContent = 'Copié'; setTimeout(() => { t.textContent = 'Copier'; }, 1500); }); } catch(_){} return; }
-  if (t.dataset.cxdone){ const c = find(t.dataset.cxdone); if (c){ c.done = true; saveColis(); renderColis(); } return; }
+  if (t.dataset.cxdone){ state.reglages.colis.items = items.filter(x => x.id !== t.dataset.cxdone); saveColis(); renderColis(); setMsg($('cxmsg'), 'Colis récupéré : suivi retiré.'); return; }
   if (t.dataset.cxundo){ const c = find(t.dataset.cxundo); if (c){ c.done = false; saveColis(); renderColis(); } return; }
   if (t.dataset.cxdel){
     if (t.dataset.sure !== '1'){ t.dataset.sure = '1'; t.textContent = 'Confirmer ?'; setTimeout(() => { if (t.isConnected){ t.dataset.sure = ''; t.textContent = 'Supprimer'; } }, 3000); return; }
@@ -3106,11 +3236,400 @@ document.querySelector('.toolpane[data-tool="colis"]').addEventListener('click',
   }
 });
 
+// ---------------------------------------------------------------------------
+// Agenda des publications, natif (08/11/2026). Données chiffrées (AES-256-GCM, PBKDF2) publiées sur
+// antoinechry.github.io/agenda-miguel : data.enc, salt.json, media/*.bin. Le déchiffrement se fait ici.
+const AGENDA = (() => {
+  const BASE = 'https://antoinechry.github.io/agenda-miguel/';
+  const q = s => document.querySelector(s);
+  const g = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const ls = {
+    get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+    set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
+    del(k){ try { localStorage.removeItem(k); } catch(e){} }
+  };
+  const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const V = '?v=' + Date.now().toString(36).slice(0, -3);
+  const DAYS = ['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
+  const MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const pd = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+  const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const monday = d => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay()+6) % 7)); return x; };
+  const todayISO = () => iso(new Date());
+
+  let KEY = null, DATA = null, wired = false, booted = false, jszipP = null;
+  const ST = { view: 'agenda', projects: ls.get('agenda.proj', []), past: ls.get('agenda.past', false), month: null };
+  let done = ls.get('agenda.done', {});
+  const blobCache = new Map(), urlCache = new Map(), READY = new Map();
+
+  function toast(m){ const t = g('agtoast'); t.textContent = m; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 2200); }
+  function loadJSZip(){
+    if (window.JSZip) return Promise.resolve();
+    return jszipP || (jszipP = new Promise((ok, ko) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      s.onload = ok; s.onerror = () => { jszipP = null; ko(new Error('jszip')); };
+      document.head.appendChild(s);
+    }));
+  }
+
+  // ----- crypto
+  async function deriveKey(pw){
+    const r = await fetch(BASE + 'salt.json' + V);
+    if (!r.ok) throw new Error('nodata');
+    const s = await r.json();
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name:'PBKDF2', salt:b64(s.salt), iterations:s.iterations, hash:'SHA-256' }, base, { name:'AES-GCM', length:256 }, true, ['decrypt']);
+  }
+  async function decrypt(buf){ const u = new Uint8Array(buf); return crypto.subtle.decrypt({ name:'AES-GCM', iv:u.slice(0,12) }, KEY, u.slice(12)); }
+  async function loadData(){
+    const r = await fetch(BASE + 'data.enc' + V);
+    if (!r.ok) throw new Error('nodata');
+    return JSON.parse(new TextDecoder().decode(await decrypt(await r.arrayBuffer())));
+  }
+  function mediaBlob(m){
+    if (!blobCache.has(m.file)) blobCache.set(m.file, (async () => {
+      const r = await fetch(BASE + m.file + V);
+      if (!r.ok) throw new Error('media');
+      return new Blob([await decrypt(await r.arrayBuffer())], { type: m.type });
+    })());
+    return blobCache.get(m.file);
+  }
+  function mediaURL(m){
+    if (!urlCache.has(m.file)) urlCache.set(m.file, mediaBlob(m).then(b => URL.createObjectURL(b)));
+    return urlCache.get(m.file);
+  }
+
+  // ----- état d'écran
+  function show(which){
+    g('aglock').hidden = which !== 'lock';
+    g('agload').hidden = which !== 'load';
+    g('agapp').hidden = which !== 'app';
+    g('aglockbtn').hidden = which !== 'app';
+  }
+  async function open(){
+    wire();
+    if (DATA){ render(); show('app'); return; }
+    if (booted) return;
+    booted = true;
+    const k = ls.get('agenda.key', null);
+    if (!k){ show('lock'); return; }
+    show('load');
+    try {
+      KEY = await crypto.subtle.importKey('raw', b64(k), { name:'AES-GCM' }, true, ['decrypt']);
+      DATA = await loadData();
+      show('app'); render();
+    } catch(e){
+      KEY = null;
+      if (e.message === 'nodata'){ g('agerr').textContent = "Aucune donnée publiée pour l'instant."; }
+      else if (e.name === 'OperationError') ls.del('agenda.key');
+      else g('agerr').textContent = 'Agenda injoignable (réseau ?). Réessaie.';
+      booted = false;
+      show('lock');
+    }
+  }
+  async function unlock(pw, remember){
+    try { KEY = await deriveKey(pw); DATA = await loadData(); } catch(e){ KEY = null; DATA = null; throw e; }
+    if (remember){
+      const raw = await crypto.subtle.exportKey('raw', KEY);
+      ls.set('agenda.key', btoa(String.fromCharCode(...new Uint8Array(raw))));
+    }
+    show('app'); render();
+  }
+
+  // ----- helpers de données
+  const proj = id => DATA.projects.find(p => p.id === id) || { id, name:id, color:'#888' };
+  const visible = x => !ST.projects.length || ST.projects.includes(x.project);
+  const skey = s => s.id || ('st:' + s.date + ':' + s.text);
+  const slinks = s => s.links || (s.link ? [{ label:'', url:s.link }] : []);
+  const item = id => DATA.posts.find(x => x.id === id) || DATA.stories.find(x => x.id === id);
+  const PHOTOS = (() => { try { return matchMedia('(pointer:coarse)').matches && typeof navigator.share === 'function' && typeof navigator.canShare === 'function'; } catch(e){ return false; } })();
+  function dlLabel(p){
+    const n = p.media.length, vid = p.media.some(m => m.type.startsWith('video'));
+    if (PHOTOS) return 'Enregistrer dans Photos' + (n > 1 ? ' · '+n+' images' : vid ? ' · vidéo' : '');
+    return 'Télécharger' + (n > 1 ? ' (zip)' : '');
+  }
+
+  // ----- rendu
+  function render(){
+    g('agprojects').innerHTML = '<button type="button" class="agchip" data-agproj="" aria-pressed="'+!ST.projects.length+'">Tous</button>' +
+      DATA.projects.map(p => '<button type="button" class="agchip" style="--c:'+esc(p.color)+'" data-agproj="'+esc(p.id)+'" aria-pressed="'+ST.projects.includes(p.id)+'"><span class="agdot"></span>'+esc(p.name)+'</button>').join('');
+    document.querySelectorAll('[data-agview]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.agview === ST.view)));
+    g('agpast').checked = ST.past;
+    const posts = DATA.posts.filter(visible), n = posts.filter(p => done[p.id]).length;
+    g('agstats').innerHTML = '<b>'+n+'</b> / '+posts.length+' publiées';
+    ST.view === 'agenda' ? renderAgenda() : renderMonth();
+  }
+  function music(m){
+    if (!m || !(m.pick || []).length) return '';
+    return '<div class="agmus"><b>♪ Musique</b>' + m.pick.map(([t,a]) => '<button type="button" class="agsong" data-agsong="'+esc(t+' '+a)+'" title="Copier pour chercher dans Instagram">'+esc(t)+' <i>· '+esc(a)+'</i></button>').join('') +
+      (m.kw ? '<span>Bibliothèque libre : « '+esc(m.kw)+' »</span>' : '') + '</div>';
+  }
+  function stMedia(s){
+    if (!s.id || !(s.media || []).length) return '';
+    const m0 = s.media[0];
+    return '<span class="agstv"><button type="button" class="agstth" data-agslide="'+esc(s.id)+'" data-i="0" aria-label="Voir le visuel de la story">' +
+      (m0.type.startsWith('video') ? '<video muted playsinline preload="metadata" data-agmedia="'+esc(s.id)+'" data-mi="0"></video>' : '<img alt="" data-agmedia="'+esc(s.id)+'" data-mi="0">') +
+      '</button><button type="button" class="btn" data-agsdl="'+esc(s.id)+'">'+dlLabel(s)+'</button>' +
+      slinks(s).map((l,j) => '<button type="button" class="btn" data-agslink="'+esc(s.id)+'" data-j="'+j+'">Copier le lien'+(l.label ? ' '+esc(l.label) : '')+'</button>').join('') + '</span>';
+  }
+  function strip(p){
+    const imgs = (p.media || []).map((m,i) => [m,i]).filter(([m]) => m.type.startsWith('image'));
+    if (imgs.length < 2) return '';
+    return '<div class="agstrip">' + imgs.map(([m,i]) => '<button type="button" class="agsl" data-agslide="'+esc(p.id)+'" data-i="'+i+'" aria-label="Visuel '+(i+1)+' : agrandir"><img alt="" data-agmedia="'+esc(p.id)+'" data-mi="'+i+'"><span>'+(i+1)+'</span></button>').join('') + '</div>';
+  }
+  function card(p){
+    const pr = proj(p.project), many = (p.media || []).length > 1, isVid = (p.media || []).some(m => m.type.startsWith('video'));
+    const tall = p.format === 'story' || p.format === 'reel';
+    return '<article class="agcard'+(done[p.id] ? ' done' : '')+'" style="--c:'+esc(pr.color)+'">' +
+      '<button type="button" class="agtb'+(tall ? ' tall' : '')+'" data-agopen="'+esc(p.id)+'" aria-label="Agrandir : '+esc(p.title)+'">' +
+      (p.thumb ? '<img alt="" data-agthumb="'+esc(p.id)+'">' : '<span class="agph"></span>') +
+      (many ? '<span class="agcount">'+p.media.length+' slides</span>' : '') + (isVid ? '<span class="agcount">▶ vidéo</span>' : '') + '</button>' +
+      '<div><div class="agmeta"><span class="agtime">'+esc(p.time || '')+'</span><span class="agtag">'+esc(p.format)+'</span>' + (p.network ? '<span class="agtag">'+esc(p.network)+'</span>' : '') + '<span class="agptag">'+esc(pr.name)+'</span></div>' +
+      '<h5>'+esc(p.title)+'</h5>' + (p.why ? '<p class="agwhy">'+esc(p.why)+'</p>' : '') + strip(p) + music(p.music) +
+      (p.caption ? '<details><summary>'+esc(p.captionLabel || 'Légende')+'</summary><div class="agcap">'+esc(p.caption)+'</div></details>' : '') +
+      '<div class="agact">' + (p.canva ? '<span class="aghint">Visuel dans Canva</span>' : (p.media || []).length ? '<button class="btn agdlb" type="button" data-agdl="'+esc(p.id)+'">'+dlLabel(p)+'</button>' : '') +
+      (p.caption && !p.captionLabel ? '<button class="btn" type="button" data-agcopy="'+esc(p.id)+'">Copier la légende</button>' : '') +
+      '<label class="agchk"><input type="checkbox" data-agdone="'+esc(p.id)+'" '+(done[p.id] ? 'checked' : '')+'> Publié</label></div></div></article>';
+  }
+  function renderAgenda(){
+    const from = ST.past ? '0000' : iso(monday(new Date())), tod = todayISO();
+    const posts = DATA.posts.filter(p => visible(p) && p.date >= from), stories = DATA.stories.filter(s => visible(s) && s.date >= from);
+    const dates = [...new Set([...posts.map(p => p.date), ...stories.map(s => s.date)])].sort();
+    if (!dates.length){ g('agmain').innerHTML = '<p class="agempty">Aucune publication à venir pour ce filtre.</p>'; return; }
+    const weeks = new Map();
+    dates.forEach(d => { const k = iso(monday(pd(d))); if (!weeks.has(k)) weeks.set(k, []); weeks.get(k).push(d); });
+    let h = '';
+    for (const [wk, ds] of weeks){
+      const a = pd(wk), b = new Date(a); b.setDate(b.getDate()+6);
+      h += '<section class="agweek"><h4>Semaine du '+a.getDate()+' '+MONTHS[a.getMonth()]+' <small>au '+b.getDate()+' '+MONTHS[b.getMonth()]+' '+b.getFullYear()+'</small></h4><div class="agroad">';
+      for (const d of ds){
+        const dt = pd(d);
+        h += '<div class="agday'+(d === tod ? ' today' : '')+'" id="agd-'+d+'" data-n="'+dt.getDate()+'"><div class="agdl">'+DAYS[dt.getDay()]+' '+dt.getDate()+' '+MONTHS[dt.getMonth()]+(d === tod ? '<em>Aujourd\'hui</em>' : '')+'</div>';
+        for (const p of posts.filter(x => x.date === d)) h += card(p);
+        const ss = stories.filter(s => s.date === d);
+        if (ss.length) h += '<div class="agstories">' + ss.map(s => '<div class="agstory'+(done[skey(s)] ? ' done' : '')+'" style="--c:'+esc(proj(s.project).color)+'"><span class="agdot"></span><span class="agtag">Story</span>'+esc(s.text) +
+          slinks(s).map(l => '<span class="agstl">🔗 '+(l.label ? esc(l.label)+' : ' : '')+esc(l.url)+'</span>').join('') + music(s.music) + stMedia(s) +
+          '<label class="agchk agstchk"><input type="checkbox" data-agdone="'+esc(skey(s))+'" '+(done[skey(s)] ? 'checked' : '')+'> Publié</label></div>').join('') + '</div>';
+        h += '</div>';
+      }
+      h += '</div></section>';
+    }
+    g('agmain').innerHTML = h; loadThumbs();
+  }
+  function renderMonth(){
+    const base = ST.month ? pd(ST.month+'-01') : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const y = base.getFullYear(), m = base.getMonth(), start = monday(new Date(y, m, 1)), tod = todayISO();
+    let h = '<section><div class="agmhead"><button class="btn" type="button" data-agmon="-1" aria-label="Mois précédent">‹</button><h4>'+MONTHS[m]+' '+y+'</h4><button class="btn" type="button" data-agmon="1" aria-label="Mois suivant">›</button></div><div class="aggrid">';
+    h += ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'].map(d => '<div class="agwd">'+d+'</div>').join('');
+    for (let i = 0; i < 42; i++){
+      const d = new Date(start); d.setDate(start.getDate()+i); const k = iso(d);
+      const items = DATA.posts.filter(p => visible(p) && p.date === k);
+      h += '<button type="button" class="agcell'+(d.getMonth() !== m ? ' out' : '')+(k === tod ? ' today' : '')+'" data-aggoto="'+k+'"><span class="agn">'+d.getDate()+'</span>' +
+        items.map(p => '<span class="agit" style="--c:'+esc(proj(p.project).color)+'">'+esc(p.time || '')+' '+esc(p.title)+'</span>').join('') + '</button>';
+      if (i === 34 && d.getMonth() !== m) break;
+    }
+    h += '</div></section>'; g('agmain').innerHTML = h;
+  }
+  function loadThumbs(){
+    const mk = fn => new IntersectionObserver(es => es.forEach(async e => {
+      if (!e.isIntersecting) return;
+      e.target._io && e.target._io.unobserve(e.target);
+      try { e.target.src = await fn(e.target); } catch(err){}
+    }), { rootMargin:'300px' });
+    const io1 = mk(el => mediaURL(DATA.posts.find(x => x.id === el.dataset.agthumb).thumb));
+    document.querySelectorAll('img[data-agthumb]').forEach(i => { i._io = io1; io1.observe(i); });
+    const io2 = mk(el => mediaURL(item(el.dataset.agmedia).media[+el.dataset.mi]));
+    document.querySelectorAll('[data-agmedia]').forEach(i => { i._io = io2; io2.observe(i); });
+    if (PHOTOS){
+      const io3 = new IntersectionObserver(es => es.forEach(e => {
+        if (!e.isIntersecting) return;
+        io3.unobserve(e.target);
+        const p = item(e.target.dataset.agdl || e.target.dataset.agsdl); prepFiles(p).catch(() => {});
+      }), { rootMargin:'200px' });
+      document.querySelectorAll('[data-agdl],[data-agsdl]').forEach(b => io3.observe(b));
+    }
+  }
+
+  // ----- partage vers Photos (téléphone)
+  function prepFiles(p){
+    return Promise.all(p.media.map(async m => {
+      if (READY.has(m.file)) return READY.get(m.file);
+      const f = new File([await mediaBlob(m)], m.name, { type:m.type }); READY.set(m.file, f); return f;
+    }));
+  }
+  async function shareToPhotos(t, p){
+    const ready = p.media.every(m => READY.has(m.file));
+    if (!ready){ const lab = t.textContent; t.disabled = true; t.textContent = 'Préparation…'; try { await prepFiles(p); } finally { t.disabled = false; t.textContent = lab; } }
+    const files = p.media.map(m => READY.get(m.file));
+    if (!navigator.canShare({ files })) return false;
+    try { await navigator.share({ files }); toast(files.length > 1 ? files.length+' visuels envoyés' : 'Visuel envoyé'); }
+    catch(err){
+      if (err && err.name === 'AbortError') return true;
+      if (err && err.name === 'NotAllowedError' && !ready){ toast('Visuels prêts : appuie encore une fois'); return true; }
+      return false;
+    }
+    return true;
+  }
+  function saveBlob(blob, name){
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  }
+
+  // ----- exports
+  const mus = (m, lib) => m && m.pick ? 'Musique : ' + m.pick.map(([a,b]) => a+' · '+b).join(' / ') + (lib && m.kw ? ' (bibliothèque : '+m.kw+')' : '') : '';
+  const fileTag = () => (ST.projects.length ? ST.projects.join('-') : 'tous-projets') + '-' + todayISO();
+  function exportCSV(){
+    const qq = v => { const s = String(v ?? ''); return /[",\n;]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+    const us = s => { const [y,m,d] = s.split('-'); return m+'/'+d+'/'+y; };
+    const t12 = t => { let [h,mi] = t.split(':').map(Number); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h+':'+String(mi).padStart(2,'0')+' '+ap; };
+    const plus = (d,t,min) => { const x = pd(d); const [h,mi] = t.split(':').map(Number); x.setHours(h, mi+min); return [iso(x), String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')]; };
+    const rows = [['Subject','Start Date','Start Time','End Date','End Time','All Day Event','Description','Location','Projet','Réseau','Format','Statut']];
+    for (const p of DATA.posts.filter(visible)){
+      const pr = proj(p.project).name, fmt = p.format || 'post', net = p.network || '';
+      const subj = '['+pr+'] '+fmt.charAt(0).toUpperCase()+fmt.slice(1)+(net ? ' '+net : '')+' — '+p.title;
+      const desc = [p.why, mus(p.music, true), p.caption ? (p.captionLabel || 'Légende')+' :\n'+p.caption : '', 'Agenda : '+BASE].filter(Boolean).join('\n\n');
+      const st = done[p.id] ? 'Publié' : 'À publier';
+      if (p.time){ const [ed, et] = plus(p.date, p.time, 30); rows.push([subj, us(p.date), t12(p.time), us(ed), t12(et), 'False', desc, net, pr, net, fmt, st]); }
+      else rows.push([subj, us(p.date), '', us(p.date), '', 'True', desc, net, pr, net, fmt, st]);
+    }
+    for (const s of DATA.stories.filter(visible)){
+      const pr = proj(s.project).name;
+      rows.push(['['+pr+'] Story — '+s.text, us(s.date), '', us(s.date), '', 'True', [s.text, mus(s.music, true), 'Agenda : '+BASE].filter(Boolean).join('\n\n'), 'Instagram', pr, 'Instagram', 'story', done[skey(s)] ? 'Publié' : 'À publier']);
+    }
+    const key = r => { const [m,d,y] = r[1].split('/'); return y+m+d+(r[2] ? '1'+r[2].padStart(8,'0') : '0'); };
+    rows.splice(1, rows.length-1, ...rows.slice(1).sort((a,b) => key(a).localeCompare(key(b))));
+    saveBlob(new Blob(['\ufeff' + rows.map(r => r.map(qq).join(',')).join('\r\n')], { type:'text/csv;charset=utf-8' }), 'agenda-'+fileTag()+'.csv');
+    toast((rows.length-1)+' lignes exportées');
+  }
+  function exportICS(){
+    const e = s => String(s ?? '').replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+    const fold = l => { const o = []; let s = l; while (s.length > 72){ o.push(s.slice(0,72)); s = ' '+s.slice(72); } o.push(s); return o.join('\r\n'); };
+    const d8 = s => s.replace(/-/g,''), nextDay = s => { const x = pd(s); x.setDate(x.getDate()+1); return d8(iso(x)); };
+    const hm = (t, add = 0) => { let [h,m] = t.split(':').map(Number); m += add; h += Math.floor(m/60); m %= 60; return String(h).padStart(2,'0')+String(m).padStart(2,'0')+'00'; };
+    const now = new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+    const L = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//agenda-miguel//FR','CALSCALE:GREGORIAN','X-WR-CALNAME:Agenda des publications','X-WR-TIMEZONE:Europe/Paris',
+      'BEGIN:VTIMEZONE','TZID:Europe/Paris','BEGIN:DAYLIGHT','TZOFFSETFROM:+0100','TZOFFSETTO:+0200','TZNAME:CEST','DTSTART:19700329T020000','RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU','END:DAYLIGHT','BEGIN:STANDARD','TZOFFSETFROM:+0200','TZOFFSETTO:+0100','TZNAME:CET','DTSTART:19701025T030000','RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU','END:STANDARD','END:VTIMEZONE'];
+    const ev = (uid, summary, start, end, desc, alarm) => { L.push('BEGIN:VEVENT','UID:'+uid+'@agenda-miguel','DTSTAMP:'+now,...start,...end,fold('SUMMARY:'+e(summary)),fold('DESCRIPTION:'+e(desc)),'URL:'+BASE,'BEGIN:VALARM','ACTION:DISPLAY',fold('DESCRIPTION:'+e(summary)),'TRIGGER:'+alarm,'END:VALARM','END:VEVENT'); };
+    for (const p of DATA.posts.filter(visible)){
+      const pr = proj(p.project).name, fmt = p.format || 'post', net = p.network || '';
+      const sum = '['+pr+'] '+fmt.charAt(0).toUpperCase()+fmt.slice(1)+(net ? ' '+net : '')+' — '+p.title;
+      const desc = [p.why, mus(p.music), p.caption ? (p.captionLabel || 'Légende')+' :\n'+p.caption : '', 'Agenda : '+BASE].filter(Boolean).join('\n\n');
+      if (p.time) ev(p.id, sum, ['DTSTART;TZID=Europe/Paris:'+d8(p.date)+'T'+hm(p.time)], ['DTEND;TZID=Europe/Paris:'+d8(p.date)+'T'+hm(p.time,30)], desc, '-PT1H');
+      else ev(p.id, sum, ['DTSTART;VALUE=DATE:'+d8(p.date)], ['DTEND;VALUE=DATE:'+nextDay(p.date)], desc, 'PT9H');
+    }
+    DATA.stories.filter(visible).forEach((s,i) => {
+      const pr = proj(s.project).name;
+      ev('story-'+s.project+'-'+s.date+'-'+i, '['+pr+'] Story — '+s.text, ['DTSTART;VALUE=DATE:'+d8(s.date)], ['DTEND;VALUE=DATE:'+nextDay(s.date)], [s.text, mus(s.music), 'Agenda : '+BASE].filter(Boolean).join('\n\n'), 'PT9H');
+    });
+    L.push('END:VCALENDAR');
+    saveBlob(new Blob([L.join('\r\n')+'\r\n'], { type:'text/calendar;charset=utf-8' }), 'agenda-'+fileTag()+'.ics');
+    toast('Agenda exporté avec les alertes');
+  }
+
+  // ----- aperçu plein écran
+  const LB = { p:null, i:0 };
+  async function lbShow(){
+    const p = LB.p, list = p.media.length ? p.media : [p.thumb], m = list[LB.i], box = g('aglb-media');
+    box.innerHTML = '<span>Chargement…</span>';
+    g('aglb-title').textContent = p.title || p.text || ''; const many = list.length > 1;
+    g('aglb-num').textContent = many ? (LB.i+1)+' / '+list.length : '';
+    g('aglb-prev').hidden = !many; g('aglb-next').hidden = !many;
+    g('aglb-dots').innerHTML = many ? list.map((_,j) => '<span class="'+(j === LB.i ? 'on' : '')+'"></span>').join('') : '';
+    try {
+      const u = await mediaURL(m); if (LB.p !== p) return; box.innerHTML = ''; let el;
+      if (m.type.startsWith('video')){ el = document.createElement('video'); el.controls = true; el.autoplay = true; el.muted = true; el.playsInline = true; el.loop = true; }
+      else { el = document.createElement('img'); el.alt = p.title || ''; }
+      el.src = u; box.appendChild(el);
+    } catch(err){ box.innerHTML = '<span>Visuel indisponible</span>'; }
+  }
+  function lbOpen(id, i = 0){
+    LB.p = item(id); if (!LB.p || (!(LB.p.media || []).length && !LB.p.thumb)) return;
+    LB.i = i; g('aglb').hidden = false; document.body.style.overflow = 'hidden'; lbShow();
+  }
+  function lbClose(){ if (g('aglb').hidden) return; g('aglb').hidden = true; g('aglb-media').innerHTML = ''; document.body.style.overflow = ''; LB.p = null; }
+  function lbStep(d){ const n = LB.p.media.length; if (n < 2) return; LB.i = (LB.i+d+n) % n; lbShow(); }
+
+  // ----- événements (une seule fois)
+  function wire(){
+    if (wired) return; wired = true;
+    g('aglock').addEventListener('submit', async ev => {
+      ev.preventDefault(); const err = g('agerr'), btn = g('agunlock');
+      err.textContent = ''; btn.disabled = true; btn.textContent = 'Ouverture…';
+      try { await unlock(g('agpw').value, g('agremember').checked); g('agpw').value = ''; }
+      catch(e){ err.textContent = e.message === 'nodata' ? "Aucune donnée publiée pour l'instant." : e.name === 'OperationError' ? 'Mot de passe incorrect.' : 'Agenda injoignable (réseau ?).'; }
+      finally { btn.disabled = false; btn.textContent = "Ouvrir l'agenda"; }
+    });
+    g('aglockbtn').addEventListener('click', () => {
+      ls.del('agenda.key'); KEY = null; DATA = null; booted = true; blobCache.clear(); READY.clear();
+      urlCache.forEach(p => p.then(u => URL.revokeObjectURL(u)).catch(() => {})); urlCache.clear();
+      g('agmain').innerHTML = ''; show('lock');
+    });
+    g('agics').addEventListener('click', exportICS);
+    g('agcsv').addEventListener('click', exportCSV);
+    g('agpast').addEventListener('change', e => { ST.past = e.target.checked; ls.set('agenda.past', ST.past); render(); });
+    g('aglb').addEventListener('click', e => {
+      if (e.target.id === 'aglb-close' || e.target.id === 'aglb' || e.target.id === 'aglb-media') lbClose();
+      if (e.target.id === 'aglb-prev') lbStep(-1);
+      if (e.target.id === 'aglb-next') lbStep(1);
+    });
+    document.addEventListener('keydown', e => {
+      if (g('aglb').hidden) return;
+      if (e.key === 'Escape') lbClose(); if (e.key === 'ArrowRight') lbStep(1); if (e.key === 'ArrowLeft') lbStep(-1);
+    });
+    let tx = null;
+    g('aglb').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive:true });
+    g('aglb').addEventListener('touchend', e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) lbStep(dx < 0 ? 1 : -1); tx = null; });
+    q('.toolpane[data-tool="agenda"]').addEventListener('change', e => {
+      const c = e.target.closest('[data-agdone]'); if (!c) return;
+      done[c.dataset.agdone] = c.checked; ls.set('agenda.done', done); render();
+    });
+    q('.toolpane[data-tool="agenda"]').addEventListener('click', async e => {
+      const t = e.target.closest('[data-agsong],[data-agproj],[data-agview],[data-agmon],[data-aggoto],[data-agopen],[data-agslide],[data-agdl],[data-agcopy],[data-agsdl],[data-agslink]');
+      if (!t) return; const d = t.dataset;
+      if (d.agsong){ try { await navigator.clipboard.writeText(d.agsong); toast("Copié : colle-le dans la recherche musique d'Instagram"); } catch(err){ toast(d.agsong); } return; }
+      if (d.agslink !== undefined){ const u = slinks(item(d.agslink))[+(d.j || 0)].url; try { await navigator.clipboard.writeText(u); toast('Lien copié : colle-le dans le sticker Lien'); } catch(err){ toast(u); } return; }
+      if (d.agsdl){
+        const st = item(d.agsdl); if (PHOTOS && await shareToPhotos(t, st)) return;
+        try { saveBlob(await mediaBlob(st.media[0]), st.media[0].name); } catch(err){ toast('Téléchargement impossible'); } return;
+      }
+      if (d.agproj !== undefined){ const id = d.agproj; ST.projects = !id ? [] : ST.projects.includes(id) ? ST.projects.filter(x => x !== id) : [...ST.projects, id]; ls.set('agenda.proj', ST.projects); render(); }
+      else if (d.agview){ ST.view = d.agview; render(); }
+      else if (d.agmon){ const b = ST.month ? pd(ST.month+'-01') : new Date(new Date().getFullYear(), new Date().getMonth(), 1); b.setMonth(b.getMonth()+Number(d.agmon)); ST.month = iso(b).slice(0,7); render(); }
+      else if (d.aggoto){
+        const k = d.aggoto; if (k < iso(monday(new Date()))){ ST.past = true; ls.set('agenda.past', true); }
+        ST.view = 'agenda'; render(); const el = g('agd-'+k); el ? el.scrollIntoView({ behavior:'smooth' }) : toast('Rien de prévu ce jour-là');
+      }
+      else if (d.agopen) lbOpen(d.agopen);
+      else if (d.agslide) lbOpen(d.agslide, +d.i);
+      else if (d.agcopy){
+        const p = DATA.posts.find(x => x.id === d.agcopy);
+        try { await navigator.clipboard.writeText(p.caption); toast('Légende copiée'); }
+        catch(err){ const c = t.closest('.agcard').querySelector('.agcap'); c.closest('details').open = true; const r = document.createRange(); r.selectNodeContents(c); getSelection().removeAllRanges(); getSelection().addRange(r); toast('Texte sélectionné'); }
+      }
+      else if (d.agdl){
+        const p = DATA.posts.find(x => x.id === d.agdl);
+        if (PHOTOS){ try { if (await shareToPhotos(t, p)) return; } catch(err){} }
+        const lab = t.textContent; t.disabled = true; t.textContent = 'Préparation…';
+        try {
+          let blob, name;
+          if (p.media.length > 1){ await loadJSZip(); const z = new JSZip(); for (const m of p.media) z.file(m.name, await mediaBlob(m)); blob = await z.generateAsync({ type:'blob' }); name = p.zipName || (p.id+'.zip'); }
+          else { blob = await mediaBlob(p.media[0]); name = p.media[0].name; }
+          saveBlob(blob, name); toast('Téléchargement lancé');
+        } catch(err){ toast('Téléchargement impossible'); }
+        finally { t.disabled = false; t.textContent = lab; }
+      }
+    });
+  }
+  return { open };
+})();
+
 // Outils : lanceur de petites apps. Pour en ajouter une : une entrée dans TOOLS + un <div class="toolpane" data-tool="<id>"> dans la vue Outils.
 const TOOLS = [
   { id: 'pneus', name: 'Pression pneus', title: 'Pression des pneus', color: '#2A6A5B',
     icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/>' },
-  { id: 'agenda', name: 'Agenda réseaux', title: 'Agenda des publications', color: '#B8501F', url: 'https://antoinechry.github.io/agenda-miguel/',
+  { id: 'agenda', name: 'Agenda réseaux', title: 'Agenda des publications', color: '#B8501F',
     icon: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15.5l3-2v4l-3-2zM11 13.5h2.5l2.5-1.5v7l-2.5-1.5H11"/>' },
   { id: 'colis', name: 'Suivi colis', title: 'Suivi de colis', color: '#2F72B5',
     icon: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8M7.5 5.5l9 5"/>' }
@@ -3127,7 +3646,7 @@ function openTool(id){
   try { localStorage.setItem('cm-tool', curTool || ''); } catch(_){}
   if (t && t.id === 'pneus' && state.user){ try { renderTire(); } catch(_){} }
   if (t && t.id === 'colis' && state.user){ try { renderColis(); } catch(_){} }
-  if (t && t.url){ const f = document.querySelector('.toolpane[data-tool="'+t.id+'"] iframe'); if (f && !f.src) f.src = t.url; }
+  if (t && t.id === 'agenda') AGENDA.open();
   if (curView === 'outils'){ updateTitle(); window.scrollTo(0, 0); }
 }
 renderLauncher();
@@ -3754,7 +4273,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-colis-1';
+const APP_VERSION = '2026-11-08-agenda-natif';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
