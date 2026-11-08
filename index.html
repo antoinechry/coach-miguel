@@ -894,7 +894,7 @@ dialog{border-radius:20px}
       </form>
       <p class="msg" id="pwmsg"></p>
       <h4>Session</h4>
-      <div class="authact"><button class="btn" id="logout">Se déconnecter</button><a class="btn" href="admin.html" id="adminLink" hidden>Administration</a></div>
+      <div class="authact"><button class="btn" id="logout">Se déconnecter</button></div>
     </section>
     <div class="dlgfoot">
       <span></span>
@@ -3304,10 +3304,6 @@ async function showApp(user){
     return;
   }
   $('noaccess').hidden = true;
-  $('adminLink').hidden = !a.is_admin;
-  // Journal par compte (table activity_log, lu par la page Admin) : une ouverture par onglet
-  try { if (!sessionStorage.getItem('cm-act-open')) { sessionStorage.setItem('cm-act-open', '1');
-    sb.from('activity_log').insert({ app: 'coach', event: 'open', device: matchMedia('(pointer:coarse)').matches ? 'mobile' : 'desktop' }).then(() => {}, () => {}); } } catch(_){}
   $('authbox').hidden = true; $('app').hidden = false; $('profbtn').hidden = false; $('refbtn').hidden = false;
   $('tabbar').hidden = false; document.body.classList.add('has-tabs');
   $('profav').textContent = (user.email || '?').charAt(0).toUpperCase();
@@ -3486,7 +3482,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-06-app-ios-2';
+const APP_VERSION = '2026-11-08-menage-1';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
