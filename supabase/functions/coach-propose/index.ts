@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 
 // Coach Miguel : « Demander une sortie » (task 'propose'), « Étude de la sortie » (task 'study')
-// et « Bilan de la semaine » (task 'week').
+// et « Bilan de la semaine » (task 'week'), et l'app Outils « Suivi de colis » (task 'colis', avec recherche et lecture web).
 // Le navigateur envoie la consigne (profil, forme, activités, dispos, demande ou sortie à étudier) ; cette fonction
 // appelle l'API Claude avec la clé ANTHROPIC_API_KEY (secret Supabase, jamais renvoyée au navigateur) et renvoie
 // la réponse JSON. Réservé aux comptes actifs ayant l'accès Coach Miguel (table app_users), dans la limite de
@@ -28,7 +28,7 @@ async function usedThisMonth(admin: SupabaseClient, uid: string, kind: string) {
 }
 const ROLE = "Tu es Miguel, coach d'endurance (vélo de route et course à pied / trail) d'un athlète amateur. ";
 const JSON_ONLY = 'Réponds uniquement avec un objet JSON valide, sans texte autour ni bloc de code.';
-const TASKS: Record<string, { system: string; maxTokens: number }> = {
+const TASKS: Record<string, { system: string; maxTokens: number; web?: boolean }> = {
   propose: {
     system: ROLE + 'Tu proposes des séances prudentes, concrètes et adaptées à sa forme du moment. ' + JSON_ONLY,
     maxTokens: 2500,
@@ -45,7 +45,21 @@ const TASKS: Record<string, { system: string; maxTokens: number }> = {
       "sans inventer de données. Tu le tutoies, phrases courtes, en français. " + JSON_ONLY,
     maxTokens: 3000,
   },
+  // Suivi de colis (08/11/2026) : Claude cherche et lit le suivi public du transporteur, puis résume l'état du colis.
+  colis: {
+    system: "Tu es l'assistant de suivi de colis d'Antoine (Ribeauvillé, Haut-Rhin). On te donne un numéro de suivi, un transporteur " +
+      "et l'adresse de sa page de suivi. Lis d'abord cette page avec web_fetch ; si elle est vide ou inexploitable (page qui se charge en JavaScript, " +
+      "connexion demandée), cherche avec web_search d'autres pages de suivi publiques pour ce numéro (site du transporteur, 17track, parcelsapp…). " +
+      "N'invente jamais d'événement, de lieu ni de date : si tu ne trouves rien de fiable, mets trouve à false et explique pourquoi dans conseil. " +
+      "Dates au format JJ/MM HH:MM, heure de Paris. Tu tutoies, phrases courtes, en français. " + JSON_ONLY,
+    maxTokens: 3000,
+    web: true,
+  },
 };
+const WEB_TOOLS = [
+  { type: 'web_fetch_20260318', name: 'web_fetch', max_uses: 4, max_content_tokens: 20000 },
+  { type: 'web_search_20250305', name: 'web_search', max_uses: 4 },
+];
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
@@ -75,18 +89,29 @@ Deno.serve(async (req: Request) => {
   if (prompt.length < 50 || prompt.length > 30000) return json({ error: 'bad_prompt' }, 400);
 
   const model = Deno.env.get('COACH_MODEL') || 'claude-sonnet-5-5';
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model, max_tokens: task.maxTokens, system: task.system, messages: [{ role: 'user', content: prompt }] }),
-  });
-  if (!r.ok) {
-    let detail = '';
-    try { const e = await r.json(); detail = e?.error?.message ?? ''; } catch (_) { /* rien */ }
-    return json({ error: 'api', status: r.status, detail: detail.slice(0, 300) }, 502);
+  // Outils web côté serveur (task 'colis') : l'API peut s'arrêter en « pause_turn » ; on relance jusqu'à 4 fois.
+  const messages: { role: string; content: unknown }[] = [{ role: 'user', content: prompt }];
+  let out: { content?: { type: string; text?: string }[]; stop_reason?: string } = {};
+  for (let i = 0; i < 4; i++) {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model, max_tokens: task.maxTokens, system: task.system, messages, ...(task.web ? { tools: WEB_TOOLS } : {}) }),
+    });
+    if (!r.ok) {
+      let detail = '';
+      try { const e = await r.json(); detail = e?.error?.message ?? ''; } catch (_) { /* rien */ }
+      return json({ error: 'api', status: r.status, detail: detail.slice(0, 300) }, 502);
+    }
+    out = await r.json();
+    if (out.stop_reason !== 'pause_turn') break;
+    messages.push({ role: 'assistant', content: out.content ?? [] });
   }
-  const out = await r.json();
-  const text = (out.content ?? []).filter((c: { type: string }) => c.type === 'text').map((c: { text: string }) => c.text).join('');
+  // Avec les outils web, la réponse finale = les blocs de texte après le dernier appel d'outil (les citations la découpent en plusieurs blocs).
+  const blocks = out.content ?? [];
+  let start = 0;
+  if (task.web) blocks.forEach((c, i) => { if (c.type !== 'text') start = i + 1; });
+  const text = blocks.slice(start).filter((c) => c.type === 'text').map((c) => c.text ?? '').join('');
   const proposal = parseJson(text);
   if (proposal) {
     await admin.from('usage_log').insert({ user_id: user.id, kind: 'miguel', detail: String(body.task ?? 'propose') });

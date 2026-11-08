@@ -381,11 +381,13 @@ section{margin-top:0}
 .tabbar button[aria-current="page"]{color:var(--accent-ink)}
 .tbrand{display:none}
 @media (max-width:899px){
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(8px + env(safe-area-inset-bottom))}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--surface);border-top:1px solid var(--line);padding:4px 6px max(4px, calc(env(safe-area-inset-bottom) - 10px))}
+  body.has-tabs .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  body.has-tabs .newver{bottom:calc(72px + env(safe-area-inset-bottom))}
   .tabbar[hidden]{display:none}
   .tabbar .tmenu{display:none}
-  .tabbar button{min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.74rem;font-weight:600}
-  .tabbar .ti{padding:4px 12px;border-radius:999px;display:flex}
+  .tabbar button{min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.72rem;font-weight:600}
+  .tabbar .ti{padding:3px 12px;border-radius:999px;display:flex}
   .tabbar button[aria-current="page"]{font-weight:750}
   .tabbar button[aria-current="page"] .ti{background:var(--accent-soft)}
   .tabbar .tl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -398,8 +400,7 @@ section{margin-top:0}
 @media (max-width:360px){
   .tabbar button{font-size:.58rem}
   .tabbar .ti{padding:4px 8px}
-  body.has-tabs .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
-  body.has-tabs .newver{bottom:calc(84px + env(safe-area-inset-bottom))}
+
 }
 @media (min-width:900px){
   .shell{display:grid;grid-template-columns:220px minmax(0,1fr)}
@@ -891,6 +892,7 @@ dialog{border-radius:20px}
         <label>Sortie vélo longue (km)<input type="number" id="goalride" min="10" max="400" step="5" inputmode="numeric"></label>
         <label>Sortie course (km)<input type="number" id="goalrun" min="2" max="60" step="1" inputmode="numeric"></label>
         <label>Course, maxi (km)<input type="number" id="goalrunmax" min="2" max="80" step="1" inputmode="numeric"></label>
+        <label>Natation, total de la semaine (m)<input type="number" id="goalswim" min="0" max="50000" step="100" inputmode="numeric"></label>
       </div>
       <p class="msg" id="goalmsg"></p>
     </section>
@@ -2238,7 +2240,7 @@ function profileLines(){
   const m = me(), g = goals(), out = [];
   if (m.prenom) out.push('- Prénom : '+m.prenom+' (tutoie-le).');
   if (m.objectif) out.push('- Objectif principal : '+m.objectif);
-  out.push('- Objectifs hebdo du plan : une sortie vélo d\'au moins '+g.ride+' km et une sortie course de '+g.run+' à '+g.runMax+' km.');
+  out.push('- Objectifs hebdo du plan : une sortie vélo d\'au moins '+g.ride+' km et une sortie course de '+g.run+' à '+g.runMax+' km'+(g.swim ? ', et '+g.swim+' m de natation au total sur la semaine' : '')+'.');
   if (m.notes) out.push('- À savoir : '+m.notes);
   if (m.materiel) out.push('- Matériel : '+m.materiel);
   const z = [m.ftp ? 'FTP vélo '+m.ftp+' W' : '', m.lthr ? 'FC seuil vélo '+m.lthr+' bpm' : '', m.lthrrun ? 'FC seuil course '+m.lthrrun+' bpm' : '', m.fcmax ? 'FC max '+m.fcmax+' bpm' : ''].filter(Boolean);
@@ -2649,31 +2651,50 @@ $('cityin').addEventListener('change', setCity);
 $('cityin').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); setCity(); } });
 
 /* ---------- Objectifs de la semaine (sortie vélo longue, sortie course) ---------- */
-// Réglables dans le profil (doc « reglages », obj : { ride, run, runMax }) ; par défaut 100 km vélo, course 10 à 12 km.
-const GOAL_DEF = { ride: 100, run: 10, runMax: 12 };
+// Réglables dans le profil (doc « reglages », obj : { ride, run, runMax, swim }) ; par défaut 100 km vélo, course 10 à 12 km,
+// natation 5 000 m au total de la semaine (08/11/2026 ; vélo et course = la plus longue sortie, natation = cumul).
+const GOAL_DEF = { ride: 100, run: 10, runMax: 12, swim: 5000 };
 const goals = () => Object.assign({}, GOAL_DEF, state.reglages.obj || {});
 function goalWeek(ws){
-  const byDay = actsByDay(), g = goals(), out = { ride: { best: 0, day: null, plan: null }, run: { best: 0, day: null, plan: null } };
+  const byDay = actsByDay(), g = goals(), out = { ride: { best: 0, day: null, plan: null }, run: { best: 0, day: null, plan: null }, swim: { best: 0, day: null, plan: null, n: 0 } };
   for (let i = 0; i < 7; i++){
     const d = addDays(ws, i), k = key(d);
     for (const a of byDay.get(k) || []){
       const c = sportCls(a.sport_type), km = (a.distance_m||0)/1000;
+      if (c === 'swim'){ out.swim.best += a.distance_m||0; out.swim.n++; out.swim.day = d; continue; }
       if (out[c] && km > out[c].best){ out[c].best = km; out[c].day = d; }
     }
     if (d > t0) for (const p of state.seances[k] || []){
       const c = sportCls(p.sport), km = Number(p.distance_km) || 0;
+      if (c === 'swim'){ out.swim.planM = (out.swim.planM || 0) + km*1000; continue; }
       if (out[c] && km >= 0.9*g[c] && !out[c].plan) out[c].plan = { d, km, titre: p.titre };
     }
   }
-  out.ride.ok = out.ride.best >= g.ride*0.97; out.run.ok = out.run.best >= g.run*0.97;
+  out.ride.ok = out.ride.best >= g.ride*0.97; out.run.ok = out.run.best >= g.run*0.97; out.swim.ok = out.swim.best >= g.swim*0.97;
   return out;
 }
 function goalBadges(ws){
   if (ws > t0 || addDays(ws, 6) < PLAN_START) return '';
   const w = goalWeek(ws), b = (ok, lab) => '<span class="gb'+(ok ? ' ok' : '')+'">'+lab+(ok ? ' ✓' : ' –')+'</span>';
-  return ' · 🎯 '+b(w.ride.ok, 'vélo')+' '+b(w.run.ok, 'course');
+  return ' · 🎯 '+b(w.ride.ok, 'vélo')+' '+b(w.run.ok, 'course')+' '+b(w.swim.ok, 'nage');
 }
 const dowFmt = new Intl.DateTimeFormat('fr-FR',{weekday:'long'});
+const fmtM = m => nf0.format(Math.round(m/50)*50)+' m';
+function swimTile(w, hist){
+  const g = goals(), x = w.swim, target = g.swim, left = Math.max(0, x.left);
+  let st;
+  if (x.ok) st = '<span class="ok">✓ Fait</span> : '+fmtM(x.best)+' en '+x.n+' séance'+(x.n > 1 ? 's' : '');
+  else if (x.weekOver) st = '<span class="up">Pas atteint</span>'+(x.best ? ' · '+fmtM(x.best) : '');
+  else st = (x.best ? fmtM(x.best)+' en '+x.n+' séance'+(x.n > 1 ? 's' : '')+' · encore '+fmtM(target - x.best) : 'Pas encore nagé')+(x.planM ? ' · prévu ≈ '+fmtM(x.planM) : '')+' · '+(left ? 'il reste '+left+' jour'+(left > 1 ? 's' : '') : 'dernier jour');
+  const pct = Math.min(100, x.best/target*100), plan = x.planM && !x.ok ? Math.min(100, (x.best + x.planM)/target*100) : null;
+  let streak = 0; for (let i = hist.length - 1; i >= 0; i--){ if (hist[i].cur && !hist[i].w.swim.ok) continue; if (hist[i].w.swim.ok) streak++; else break; }
+  return '<div class="gtile" style="--c:var(--swim)"><div class="gl"><span>🏊 Natation</span><span>objectif '+nf0.format(target)+' m / semaine</span></div>'
+    + '<div class="gv">'+nf0.format(Math.round(x.best))+' m<small>/ '+nf0.format(target)+' m</small></div>'
+    + '<div class="gbar"><span style="width:'+pct.toFixed(0)+'%"></span>'+(plan != null ? '<i style="left:'+plan.toFixed(0)+'%" title="Avec les séances prévues"></i>' : '')+'</div>'
+    + '<div class="gs">'+st+'</div>'
+    + '<div class="ghist" title="8 dernières semaines">'+hist.map(h => '<span class="'+(h.w.swim.ok ? 'ok' : '')+(h.cur ? ' cur' : '')+'" title="Semaine du '+shortFmt(h.ws)+' : '+fmtM(h.w.swim.best)+'"></span>').join('')
+    + (streak >= 2 ? '<em>'+streak+' semaines d\'affilée</em>' : '')+'</div></div>';
+}
 function goalTile(c, w, ws, hist){
   const g = goals(), x = w[c], target = g[c], over = c === 'run' && x.best > g.runMax*1.15;
   const lab = c === 'ride' ? '🚴 Sortie vélo longue' : '🏃 Sortie course';
@@ -2698,9 +2719,10 @@ function renderGoals(){
   const ws = startOfWeek(t0), w = goalWeek(ws), hist = [];
   for (let i = 7; i >= 0; i--){ const h = addDays(ws, -7*i); hist.push({ ws: h, w: goalWeek(h), cur: i === 0 }); }
   $('goalweek').textContent = (addDays(ws,6) >= PLAN_START ? 'semaine '+planWeek(addDays(ws,6))+' · ' : '')+'du '+shortFmt(ws)+' au '+shortFmt(addDays(ws,6));
-  const n = (w.ride.ok ? 1 : 0) + (w.run.ok ? 1 : 0);
-  $('goalkeys').innerHTML = '<span><b>'+n+'/2</b> atteint'+(n > 1 ? 's' : '')+'</span>';
-  $('ggrid').innerHTML = goalTile('ride', w, ws, hist) + goalTile('run', w, ws, hist);
+  const n = (w.ride.ok ? 1 : 0) + (w.run.ok ? 1 : 0) + (w.swim.ok ? 1 : 0);
+  w.swim.left = Math.round((addDays(ws, 7) - t0)/86400000) - 1; w.swim.weekOver = addDays(ws, 6) < t0;
+  $('goalkeys').innerHTML = '<span><b>'+n+'/3</b> atteint'+(n > 1 ? 's' : '')+'</span>';
+  $('ggrid').innerHTML = goalTile('ride', w, ws, hist) + goalTile('run', w, ws, hist) + swimTile(w, hist);
 }
 function setGoalOpen(open){
   $('ggrid').hidden = !open; $('gtoggle').textContent = open ? '▴' : '▾'; $('gtoggle').setAttribute('aria-expanded', String(open));
@@ -2709,15 +2731,15 @@ function setGoalOpen(open){
 }
 $('gtoggle').addEventListener('click', () => setGoalOpen($('ggrid').hidden));
 try { if (localStorage.getItem('cm-goal-open') === '0') setGoalOpen(false); } catch(_){}
-function fillGoalInputs(){ const g = goals(); $('goalride').value = g.ride; $('goalrun').value = g.run; $('goalrunmax').value = g.runMax; setMsg($('goalmsg'), ''); }
+function fillGoalInputs(){ const g = goals(); $('goalride').value = g.ride; $('goalrun').value = g.run; $('goalrunmax').value = g.runMax; $('goalswim').value = g.swim; setMsg($('goalmsg'), ''); }
 async function saveGoals(){
-  const ride = Math.round(Number($('goalride').value)), run = Math.round(Number($('goalrun').value)), runMax = Math.round(Number($('goalrunmax').value));
+  const ride = Math.round(Number($('goalride').value)), run = Math.round(Number($('goalrun').value)), runMax = Math.round(Number($('goalrunmax').value)), swim = Math.round(Number($('goalswim').value) || 0);
   if (!(ride >= 10 && run >= 2 && runMax >= run)){ setMsg($('goalmsg'), 'Valeurs à vérifier (la course maxi doit être au moins égale à la course).', true); return; }
-  state.reglages.obj = { ride, run, runMax };
+  state.reglages.obj = { ride, run, runMax, swim };
   try { await saveDoc('reglages', state.reglages); setMsg($('goalmsg'), 'Objectifs enregistrés.'); } catch(_){ setMsg($('goalmsg'), 'Échec de l\'enregistrement.', true); }
   renderCalendar();
 }
-for (const id of ['goalride', 'goalrun', 'goalrunmax']) $(id).addEventListener('change', saveGoals);
+for (const id of ['goalride', 'goalrun', 'goalrunmax', 'goalswim']) $(id).addEventListener('change', saveGoals);
 
 /* ---------- Bilan de la semaine par Miguel (fonction coach-propose, task 'week') ---------- */
 // Gardé dans le doc « bilans » : { weeks: { 'AAAA-MM-JJ' (lundi) : bilan } }.
@@ -2755,7 +2777,7 @@ function buildWeekPrompt(ws){
     '',
     'Profil et objectifs :', ...profileLines(),
     '',
-    'Objectifs hebdo : une sortie vélo d\'au moins '+g.ride+' km et une sortie course de '+g.run+' à '+g.runMax+' km.',
+    'Objectifs hebdo : une sortie vélo d\'au moins '+g.ride+' km et une sortie course de '+g.run+' à '+g.runMax+' km'+(g.swim ? ', et '+g.swim+' m de natation au total sur la semaine' : '')+'.',
     '- Vélo : '+(gw.ride.ok ? 'atteint ('+nf1.format(gw.ride.best)+' km)' : 'pas atteint'+(gw.ride.best ? ', plus longue '+nf1.format(gw.ride.best)+' km' : '')+(gw.ride.plan ? ', une sortie de ≈ '+nf0.format(gw.ride.plan.km)+' km est prévue le '+key(gw.ride.plan.d) : '')),
     '- Course : '+(gw.run.ok ? 'atteint ('+nf1.format(gw.run.best)+' km)' : 'pas atteint'+(gw.run.best ? ', plus longue '+nf1.format(gw.run.best)+' km' : '')+(gw.run.plan ? ', une sortie de ≈ '+nf0.format(gw.run.plan.km)+' km est prévue le '+key(gw.run.plan.d) : '')),
     '',
@@ -3527,7 +3549,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-outils-apps-1';
+const APP_VERSION = '2026-11-08-natation-1';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
