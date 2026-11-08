@@ -545,6 +545,64 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
 .toolext{margin-left:auto;font-size:.85rem;color:var(--accent-ink);white-space:nowrap}
 .toolframe{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);height:calc(100dvh - 230px - env(safe-area-inset-bottom));min-height:440px}
 .toolframe iframe{display:block;width:100%;height:100%;border:0}
+/* Suivi de colis (08/11/2026) */
+.cxadd h3{margin:0 0 10px}
+.cxgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cxgrid .wide{grid-column:1/-1}
+.cxgrid label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.cxgrid small{font-weight:400}
+.cxgrid input,.cxgrid select{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:.55rem .65rem;min-width:0;min-height:44px;box-sizing:border-box}
+#cxnum{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}
+.cxact{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.cxact .msg{margin:0}
+.cxsum{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 10px}
+.cxlist{display:grid;gap:12px;align-items:start}
+@media (min-width:900px){ .cxlist{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))} }
+.cx{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.cx.alert{border-color:var(--run)}
+.cx .chd{padding:14px 16px 8px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;align-items:baseline}
+.cx .chd h4{margin:0;font-size:1.05rem;line-height:1.25;min-width:0}
+.cx .cmeta{font-size:.82rem;color:var(--muted)}
+.cx .cst{padding:0 16px 10px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:.85rem;color:var(--muted)}
+.cpill{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink)}
+.cpill.ok{background:var(--accent);color:var(--on-accent)}
+.cpill.warn{background:color-mix(in srgb, var(--run) 18%, transparent);color:var(--run)}
+.cpill.grey{background:var(--surface-2);color:var(--muted)}
+.cx .cbox{margin:0 16px 12px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);display:flex;flex-direction:column;gap:2px}
+.cx .cbox small{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--accent-ink)}
+.cx .cbox b{font-size:1rem}
+.cx .cbox span{font-size:.85rem;color:var(--muted)}
+.cx .cnote{margin:0 16px 12px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb, var(--run) 12%, transparent);font-size:.88rem}
+.cx .clab{border-top:1px dashed var(--line);padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.cx .clab code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.98rem;font-weight:600;letter-spacing:.03em;word-break:break-all}
+.cx .clab small{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.cx .cbtns{display:flex;gap:6px;flex-wrap:wrap}
+.cx .cbtns .btn{min-height:36px;padding:.3rem .8rem;font-size:.82rem}
+.cx .croute{border-top:1px solid var(--line);padding:10px 16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cx .croute div{display:flex;flex-direction:column;gap:1px;min-width:0;font-size:.85rem}
+.cx .croute small{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.cx .croute em{font-style:normal;font-size:.78rem;color:var(--muted)}
+.cx .croute .now span{color:var(--accent-ink);font-weight:650}
+.cx .csteps{list-style:none;margin:0;padding:10px 16px 12px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.cx .csteps li{display:flex;flex-direction:column;gap:5px;font-size:.68rem;color:var(--muted);line-height:1.25}
+.cx .csteps li::before{content:"";height:5px;border-radius:3px;background:var(--line)}
+.cx .csteps li.done::before{background:var(--accent)}
+.cx.alert .csteps li.done::before{background:var(--run)}
+.cx .csteps li.cur{color:var(--ink);font-weight:700}
+.cx details{border-top:1px solid var(--line)}
+.cx summary{padding:10px 16px;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--muted)}
+.cx .cev{list-style:none;margin:0;padding:0 16px 12px;display:flex;flex-direction:column;gap:6px}
+.cx .cev li{display:grid;grid-template-columns:96px 1fr;gap:10px;font-size:.85rem}
+.cx .cev time{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem;color:var(--muted)}
+.cx .cfoot{border-top:1px solid var(--line);padding:8px 16px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+.cxdone{margin-top:16px}
+.cxdone>summary{cursor:pointer;font-weight:650;color:var(--muted);margin-bottom:10px}
+.cxfoot{margin-top:16px;font-size:.82rem}
+@media (max-width:560px){
+  .cxgrid{grid-template-columns:minmax(0,1fr)}
+  .cx .croute{grid-template-columns:minmax(0,1fr);gap:6px}
+  .cx .cev li{grid-template-columns:minmax(0,1fr);gap:0}
+}
 @media (max-width:899px){ .toolframe{height:calc(100dvh - 210px - env(safe-area-inset-top) - env(safe-area-inset-bottom))} }
 .toolgrid{display:grid;gap:0 16px;align-items:start}
 @media (min-width:900px){ .toolgrid{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))} }
@@ -845,6 +903,22 @@ dialog{border-radius:20px}
       <div class="toolpane" data-tool="agenda" hidden>
         <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Agenda des publications</h3><a class="toolext" href="https://antoinechry.github.io/agenda-miguel/" target="_blank" rel="noopener">Ouvrir à part ↗</a></div>
         <div class="toolframe"><iframe id="agendaframe" title="Agenda des publications réseaux" loading="lazy" referrerpolicy="no-referrer"></iframe></div>
+      </div>
+      <div class="toolpane" data-tool="colis" hidden>
+        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Suivi de colis</h3></div>
+        <form class="pcard cxadd" id="cxform" autocomplete="off">
+          <h3>Ajouter un colis</h3>
+          <div class="cxgrid">
+            <label class="wide">Numéro de suivi<input id="cxnum" required maxlength="60" placeholder="Ex. XW640125053TS" autocapitalize="characters" spellcheck="false"></label>
+            <label>Transporteur<select id="cxcar"></select></label>
+            <label>Nom du colis <small>facultatif</small><input id="cxname" maxlength="80" placeholder="Ex. Pneus Vinted"></label>
+          </div>
+          <div class="cxact"><button class="btn primary" type="submit" id="cxgo">Ajouter et suivre</button><span class="msg" id="cxmsg" aria-live="polite"></span></div>
+        </form>
+        <div class="cxsum" id="cxsum"></div>
+        <div class="cxlist" id="cxlist"></div>
+        <details class="cxdone" id="cxdonewrap" hidden><summary id="cxdonesum">Colis récupérés</summary><div class="cxlist" id="cxdone"></div></details>
+        <p class="sub cxfoot">« Actualiser » demande à Claude de lire le suivi du transporteur (≈ 2 à 6 centimes). Certains sites de suivi ne se laissent pas lire : le bouton « Suivre » ouvre toujours la page officielle.</p>
       </div>
     </section>
 
@@ -2905,12 +2979,141 @@ function updateTitle(){
 }
 $('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (!b) return; if (b.dataset.view === 'outils' && curView === 'outils') openTool(null); setView(b.dataset.view); });
 
+/* ---------- App « Suivi de colis » (08/11/2026) ----------
+   Colis gardés dans le doc « reglages », clé colis : { items: [{ id, nom, vendeur, car, num, ajoute, done, last, maj }] }.
+   « Actualiser » : tâche 'colis' de coach-propose (Claude lit la page de suivi du transporteur ou cherche le numéro sur le web). */
+const CARRIERS = {
+  auto: { n: 'Je ne sais pas', u: n => 'https://parcelsapp.com/fr/tracking/'+n },
+  chrono: { n: 'Chronopost', u: n => 'https://www.chronopost.fr/tracking-no-cms/suivi-page?listeNumerosLT='+n },
+  s2s: { n: 'Chronopost Shop2Shop', u: n => 'https://www.chronoshop2shop.fr/tracking/#/numlt/'+n },
+  colissimo: { n: 'Colissimo / La Poste', u: n => 'https://www.laposte.fr/outils/suivre-vos-envois?code='+n },
+  mondial: { n: 'Mondial Relay', u: n => 'https://www.mondialrelay.fr/suivi-de-colis/?numeroExpedition='+n },
+  relais: { n: 'Relais Colis', u: n => 'https://www.relaiscolis.com/suivi-de-colis/index.php?valeur='+n+'&typeRecherche=EXP' },
+  vintedgo: { n: 'Vinted Go', u: n => 'https://vintedgo.com/fr/tracking/'+n },
+  dpd: { n: 'DPD / SEUR', u: n => 'https://trace.dpd.fr/fr/trace/'+n },
+  gls: { n: 'GLS', u: n => 'https://gls-group.com/FR/fr/suivi-colis?match='+n },
+  ups: { n: 'UPS', u: n => 'https://www.ups.com/track?loc=fr_FR&tracknum='+n },
+  dhl: { n: 'DHL', u: n => 'https://www.dhl.com/fr-fr/home/suivi.html?tracking-id='+n },
+  fedex: { n: 'FedEx', u: n => 'https://www.fedex.com/fedextrack/?trknbr='+n },
+  amazon: { n: 'Amazon Logistics', u: n => 'https://parcelsapp.com/fr/tracking/'+n }
+};
+const CX_STEPS = ['Préparation', 'Déposé', 'En chemin', 'Prêt / en livraison', 'Remis'];
+const CX_STATUS = { preparation: ['Préparation', 'grey'], en_chemin: ['En chemin', ''], en_livraison: ['En livraison', ''], disponible: ['À récupérer', 'ok'],
+  livre: ['Livré', 'ok'], retour: ['Retour vendeur', 'warn'], probleme: ['Problème', 'warn'], inconnu: ['Inconnu', 'grey'] };
+// Les 6 colis de l'artefact « Colis Vinted en route » (relevé du 06/11/2026), repris tels quels à la première ouverture.
+const CX_SEED = [
+  { nom: 'Paire de pneus Overide 700×35 Tubeless', vendeur: 'touf762 · 67,49 €', car: 's2s', num: 'XW640125053TS', last: { trouve: true, statut: 'disponible', libelle: 'Arrivé au relais', etape: 3, depart: 'Saint-André-lez-Lille (59)', position: 'Accueil E.Leclerc Ribeauvillé', position_date: '06/11', arrivee: 'Ton point relais', point_retrait: { nom: 'Accueil E.Leclerc Ribeauvillé', adresse: '12 rue de l\'Industrie, 68150 Ribeauvillé', horaires: 'du lundi au samedi de 8h00 à 19h15' }, evenements: [{ date: '06/11 06:44', texte: 'Colis en cours de livraison' }, { date: '06/11 05:12', texte: 'Arrivé au centre de tri' }, { date: '05/11 12:09', texte: 'Tri effectué dans l\'agence de départ' }, { date: '04/11 11:31', texte: 'Déposé en relais Pickup' }, { date: '02/11 15:16', texte: 'Numéro de suivi créé' }] } },
+  { nom: 'Espumador Nespresso', vendeur: 'mandelain2 · 31,70 €', car: 'dpd', num: '07304107884515', last: { trouve: true, statut: 'disponible', libelle: 'Arrivé au relais', etape: 3, depart: 'Totana, Espagne', position: 'Accueil E.Leclerc Ribeauvillé', position_date: '06/11', arrivee: 'Ton point relais', point_retrait: { nom: 'Accueil E.Leclerc Ribeauvillé', adresse: '12 rue de l\'Industrie, 68150 Ribeauvillé', horaires: 'du lundi au samedi de 8h00 à 19h15' }, evenements: [{ date: '06/11 01:00', texte: 'Arrivé au centre de tri' }, { date: '05/11 17:33', texte: 'Arrivé au centre de tri' }, { date: '04/11 15:29', texte: 'Arrivé au centre de tri' }, { date: '03/11 19:51', texte: 'Colis en cours de livraison' }], conseil: 'SEUR Shop2Shop (réseau DPD). La page DPD demande parfois une connexion ; le suivi reste visible dans la conversation Vinted.' } },
+  { nom: 'Bracelet Coros', vendeur: 'yasmina19bou · 82,44 €', car: 's2s', num: 'XW642503464TS', last: { trouve: true, statut: 'en_chemin', libelle: 'Trié à l\'agence de départ', etape: 2, depart: 'Barberey-Saint-Sulpice (10)', position: 'Agence de départ', position_date: '05/11 14:54', arrivee: 'Ton point relais', estimation: 'Transporteur : du 9 au 11 nov.', evenements: [{ date: '05/11 14:54', texte: 'Tri effectué dans l\'agence de départ' }, { date: '05/11 09:46', texte: 'Déposé en relais Pickup' }, { date: '03/11 22:45', texte: 'Numéro de suivi créé' }] } },
+  { nom: 'Commande H2R Équipements', vendeur: 'Hors Vinted · réf. CV261101297LP261100353', car: 'chrono', num: 'XY514508176JB', last: { trouve: true, statut: 'en_chemin', libelle: 'En chemin', etape: 2, depart: 'H2R Équipements', position: 'En chemin', position_date: '06/11 15:11', arrivee: 'Ton adresse (livraison à domicile)', estimation: 'Transporteur : samedi 7 nov., à domicile' } },
+  { nom: 'Rasoir à bouloches', vendeur: 'manon2534 · 11,20 € hors port', car: 'vintedgo', num: '1793910812366291', last: { trouve: true, statut: 'en_chemin', libelle: 'Remis au transporteur', etape: 1, depart: 'France', position: 'Remis au transporteur', position_date: '06/11 08:05', arrivee: 'Ton point de retrait', estimation: 'Transporteur : du 13 au 17 nov.', evenements: [{ date: '06/11 09:52', texte: 'Colis en cours de livraison (selon Vinted)' }, { date: '06/11 08:05', texte: 'Colis expédié' }, { date: '05/11 20:33', texte: 'Bordereau d\'envoi créé' }] } },
+  { nom: 'Support de poignée Osmo Action mini', vendeur: 'rd-_692 · 19,44 €', car: 's2s', num: 'XW621686679TS', last: { trouve: true, statut: 'retour', libelle: 'Retourné au vendeur', etape: 2, depart: 'Accueil E.Leclerc Ribeauvillé', position: 'La Poste Vénissieux Minguettes', position_date: '24/10 11:11', arrivee: 'Chez le vendeur', conseil: 'Vinted affiche « disponible à Ribeauvillé », mais le relais l\'a rendu au transporteur le 24/10. Ne clique pas sur « Bien reçu » ; si rien ne bouge, signale-le au support Vinted avec ce numéro.', evenements: [{ date: '24/10 11:11', texte: 'Mis à disposition à La Poste de Vénissieux Minguettes' }, { date: '24/10 10:47', texte: 'Remis par le relais Leclerc Ribeauvillé au chauffeur' }, { date: '23/10 10:53', texte: 'Disponible à l\'accueil E.Leclerc Ribeauvillé' }, { date: '22/10 10:57', texte: 'Déposé en relais Pickup à Vénissieux' }] } }
+];
+const CX = { busy: {}, timer: null };
+function cxData(){
+  const r = state.reglages;
+  if (!r.colis){ r.colis = { items: CX_SEED.map((c, i) => Object.assign({ id: 'cx'+(Date.now()+i).toString(36), ajoute: '2026-11-06', maj: '2026-11-06T15:00:00', seed: true }, c)) }; saveColis(); }
+  return r.colis;
+}
+function saveColis(){
+  clearTimeout(CX.timer);
+  CX.timer = setTimeout(async () => { try { await saveDoc('reglages', state.reglages); } catch(_){ setMsg($('cxmsg'), 'Échec de l\'enregistrement, réessaie.', true); } }, 500);
+}
+function cxUrl(c){ const k = CARRIERS[c.car] || CARRIERS.auto; return k.u(encodeURIComponent(c.num)); }
+const cxWhen = iso => { const d = new Date(iso); return isNaN(d) ? '' : shortFmt(d)+' à '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
+function cxCard(c){
+  const L = c.last || {}, st = CX_STATUS[L.statut] || CX_STATUS.inconnu, busy = CX.busy[c.id];
+  const alert = L.statut === 'retour' || L.statut === 'probleme', step = Number.isFinite(+L.etape) ? Math.max(0, Math.min(4, +L.etape)) : -1;
+  const pr = L.point_retrait && L.point_retrait.nom ? L.point_retrait : null;
+  let h = '<article class="cx'+(alert ? ' alert' : '')+'" data-cx="'+esc(c.id)+'">'
+    + '<div class="chd"><h4>'+esc(c.nom || c.num)+'</h4>'+(c.vendeur ? '<span class="cmeta">'+esc(c.vendeur)+'</span>' : '')+'</div>'
+    + '<div class="cst"><span class="cpill '+st[1]+'">'+(busy ? 'Recherche…' : esc(st[0]))+'</span>'+(L.libelle ? '<span>'+esc(L.libelle)+'</span>' : (c.last ? '' : '<span>Pas encore relevé</span>'))+'</div>';
+  if (L.statut === 'disponible' && pr) h += '<div class="cbox"><small>À récupérer</small><b>'+esc(pr.nom)+'</b>'+(pr.adresse || pr.horaires ? '<span>'+esc([pr.adresse, pr.horaires].filter(Boolean).join(' · '))+'</span>' : '')+'</div>';
+  else if (L.estimation && !['livre','retour'].includes(L.statut)) h += '<div class="cbox"><small>Arrivée prévue</small><b>'+esc(L.estimation)+'</b></div>';
+  if (L.conseil) h += '<div class="cnote">'+esc(L.conseil)+'</div>';
+  h += '<div class="clab"><div><small>'+esc((CARRIERS[c.car] || CARRIERS.auto).n)+'</small><code>'+esc(c.num)+'</code></div><div class="cbtns">'
+    + '<button class="btn" type="button" data-cxcopy="'+esc(c.num)+'">Copier</button>'
+    + '<a class="btn" href="'+esc(cxUrl(c))+'" target="_blank" rel="noopener">Suivre ↗</a>'
+    + '<button class="btn primary" type="button" data-cxref="'+esc(c.id)+'"'+(busy ? ' disabled' : '')+'>'+(busy ? 'Recherche…' : 'Actualiser')+'</button></div></div>';
+  if (L.depart || L.position || L.arrivee) h += '<div class="croute"><div><small>Départ</small><span>'+esc(L.depart || '–')+'</span></div><div class="now"><small>Position</small><span>'+esc(L.position || '–')+'</span>'+(L.position_date ? '<em>'+esc(L.position_date)+'</em>' : '')+'</div><div><small>Arrivée</small><span>'+esc(L.arrivee || '–')+'</span></div></div>';
+  if (step >= 0 && L.statut !== 'retour') h += '<ol class="csteps">'+CX_STEPS.map((t, i) => '<li class="'+(i <= step ? 'done' : '')+(i === step ? ' cur' : '')+'">'+t+'</li>').join('')+'</ol>';
+  if (Array.isArray(L.evenements) && L.evenements.length) h += '<details><summary>Historique ('+L.evenements.length+')</summary><ul class="cev">'+L.evenements.slice(0, 20).map(e => '<li><time>'+esc(e.date || '')+'</time><span>'+esc(e.texte || '')+'</span></li>').join('')+'</ul></details>';
+  h += '<div class="cfoot"><span>'+(c.maj ? 'Relevé le '+esc(cxWhen(c.maj)) : 'Ajouté le '+esc(cxWhen(c.ajoute)))+(c.seed && !c.majClaude ? ' (artefact)' : '')+'</span><span class="cbtns">'
+    + (c.done ? '<button class="btn" type="button" data-cxundo="'+esc(c.id)+'">Remettre en cours</button>' : '<button class="btn" type="button" data-cxdone="'+esc(c.id)+'">Récupéré ✓</button>')
+    + '<button class="btn" type="button" data-cxdel="'+esc(c.id)+'">Supprimer</button></span></div>';
+  return h + '</article>';
+}
+function renderColis(){
+  if (!state.user || !$('cxlist')) return;
+  if (!$('cxcar').options.length) $('cxcar').innerHTML = Object.entries(CARRIERS).map(([k, v]) => '<option value="'+k+'">'+esc(v.n)+'</option>').join('');
+  const items = cxData().items, cur = items.filter(c => !c.done), done = items.filter(c => c.done);
+  const n = s => cur.filter(c => (c.last || {}).statut === s).length, dispo = n('disponible'), ret = n('retour') + n('probleme'), road = cur.length - dispo - ret;
+  $('cxsum').innerHTML = cur.length ? [dispo ? '<span class="cpill ok">'+dispo+' à récupérer</span>' : '', road ? '<span class="cpill">'+road+' en route</span>' : '', ret ? '<span class="cpill warn">'+ret+' en retour ou en souci</span>' : ''].join('') : '<span class="sub">Aucun colis en cours.</span>';
+  const order = { disponible: 0, en_livraison: 1, en_chemin: 2, preparation: 3, inconnu: 4, probleme: 5, retour: 6, livre: 7 };
+  cur.sort((a, b) => (order[(a.last||{}).statut] ?? 4) - (order[(b.last||{}).statut] ?? 4));
+  $('cxlist').innerHTML = cur.map(cxCard).join('');
+  $('cxdonewrap').hidden = !done.length; $('cxdonesum').textContent = 'Colis récupérés ('+done.length+')';
+  $('cxdone').innerHTML = done.map(cxCard).join('');
+}
+async function refreshColis(id){
+  const c = cxData().items.find(x => x.id === id); if (!c || CX.busy[id]) return;
+  CX.busy[id] = true; renderColis();
+  const prev = c.last ? JSON.stringify({ statut: c.last.statut, position: c.last.position, position_date: c.last.position_date, evenements: (c.last.evenements || []).slice(0, 8) }) : 'aucun';
+  const prompt = [
+    'Nous sommes le '+longFmt.format(new Date())+'.',
+    'Colis : '+(c.nom || 'sans nom')+(c.vendeur ? ' ('+c.vendeur+')' : ''),
+    'Numéro de suivi : '+c.num,
+    'Transporteur indiqué : '+(CARRIERS[c.car] || CARRIERS.auto).n+(c.car === 'auto' ? ' (à identifier d\'après le format du numéro)' : ''),
+    'Page de suivi officielle : '+cxUrl(c),
+    'Autre page publique possible : https://parcelsapp.com/fr/tracking/'+encodeURIComponent(c.num),
+    'Dernier état connu (à compléter, pas à recopier s\'il a changé) : '+prev,
+    '',
+    'Trouve l\'état actuel de ce colis et réponds avec exactement cet objet JSON :',
+    '{"trouve": true|false, "transporteur": "nom réel du transporteur", "statut": "preparation|en_chemin|en_livraison|disponible|livre|retour|probleme|inconnu", "libelle": "état en quelques mots", "etape": 0-4 (0 préparation, 1 déposé/remis au transporteur, 2 en chemin, 3 disponible en relais ou en livraison, 4 remis/livré), "depart": "ville ou pays de départ", "position": "dernière position connue", "position_date": "JJ/MM HH:MM", "arrivee": "destination (relais, domicile…)", "point_retrait": {"nom": "", "adresse": "", "horaires": ""} ou null, "estimation": "date de livraison annoncée par le transporteur, ou ta déduction prudente précédée de « Estimation : »", "evenements": [{"date": "JJ/MM HH:MM", "texte": "événement"}] du plus récent au plus ancien, "conseil": "une ou deux phrases utiles (retrait, retard, retour…) ou chaîne vide", "sources": ["adresses lues"]}',
+    'Si rien de fiable n\'est trouvé : trouve=false, statut="inconnu", et explique dans conseil (par exemple : la page du transporteur se charge en JavaScript et n\'a pas pu être lue).'
+  ].join('\n');
+  try {
+    const j = await callCoach('colis', prompt);
+    const p = j.proposal || {};
+    if (p.trouve === false && c.last && c.last.trouve){ c.last.conseil = 'Pas de nouvelle info trouvée le '+cxWhen(new Date().toISOString())+'. '+(p.conseil || ''); }
+    else c.last = p;
+    c.maj = new Date().toISOString(); c.majClaude = true;
+    saveColis(); setMsg($('cxmsg'), '');
+  } catch(e){ setMsg($('cxmsg'), e.message || 'La recherche a échoué.', true); }
+  delete CX.busy[id]; renderColis();
+}
+$('cxform').addEventListener('submit', e => {
+  e.preventDefault();
+  const num = $('cxnum').value.replace(/\s+/g, '').toUpperCase();
+  if (num.length < 6){ setMsg($('cxmsg'), 'Numéro trop court.', true); return; }
+  const items = cxData().items;
+  if (items.some(c => c.num === num && !c.done)){ setMsg($('cxmsg'), 'Ce colis est déjà suivi.', true); return; }
+  const c = { id: 'cx'+Date.now().toString(36), nom: $('cxname').value.trim(), car: $('cxcar').value, num, ajoute: new Date().toISOString() };
+  items.unshift(c); saveColis();
+  $('cxnum').value = ''; $('cxname').value = ''; setMsg($('cxmsg'), 'Ajouté. Claude cherche le suivi…');
+  renderColis(); refreshColis(c.id);
+});
+document.querySelector('.toolpane[data-tool="colis"]').addEventListener('click', e => {
+  const t = e.target.closest('[data-cxref],[data-cxcopy],[data-cxdone],[data-cxundo],[data-cxdel]'); if (!t) return;
+  const items = cxData().items, find = id => items.find(x => x.id === id);
+  if (t.dataset.cxref){ setMsg($('cxmsg'), ''); refreshColis(t.dataset.cxref); return; }
+  if (t.dataset.cxcopy){ const v = t.dataset.cxcopy; try { navigator.clipboard.writeText(v).then(() => { t.textContent = 'Copié'; setTimeout(() => { t.textContent = 'Copier'; }, 1500); }); } catch(_){} return; }
+  if (t.dataset.cxdone){ const c = find(t.dataset.cxdone); if (c){ c.done = true; saveColis(); renderColis(); } return; }
+  if (t.dataset.cxundo){ const c = find(t.dataset.cxundo); if (c){ c.done = false; saveColis(); renderColis(); } return; }
+  if (t.dataset.cxdel){
+    if (t.dataset.sure !== '1'){ t.dataset.sure = '1'; t.textContent = 'Confirmer ?'; setTimeout(() => { if (t.isConnected){ t.dataset.sure = ''; t.textContent = 'Supprimer'; } }, 3000); return; }
+    state.reglages.colis.items = items.filter(x => x.id !== t.dataset.cxdel); saveColis(); renderColis();
+  }
+});
+
 // Outils : lanceur de petites apps. Pour en ajouter une : une entrée dans TOOLS + un <div class="toolpane" data-tool="<id>"> dans la vue Outils.
 const TOOLS = [
   { id: 'pneus', name: 'Pression pneus', title: 'Pression des pneus', color: '#2A6A5B',
     icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/>' },
   { id: 'agenda', name: 'Agenda réseaux', title: 'Agenda des publications', color: '#B8501F', url: 'https://antoinechry.github.io/agenda-miguel/',
-    icon: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15.5l3-2v4l-3-2zM11 13.5h2.5l2.5-1.5v7l-2.5-1.5H11"/>' }
+    icon: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15.5l3-2v4l-3-2zM11 13.5h2.5l2.5-1.5v7l-2.5-1.5H11"/>' },
+  { id: 'colis', name: 'Suivi colis', title: 'Suivi de colis', color: '#2F72B5',
+    icon: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8M7.5 5.5l9 5"/>' }
 ];
 let curTool = null;
 function renderLauncher(){
@@ -2923,6 +3126,7 @@ function openTool(id){
   for (const p of document.querySelectorAll('.toolpane')) p.hidden = !t || p.dataset.tool !== t.id;
   try { localStorage.setItem('cm-tool', curTool || ''); } catch(_){}
   if (t && t.id === 'pneus' && state.user){ try { renderTire(); } catch(_){} }
+  if (t && t.id === 'colis' && state.user){ try { renderColis(); } catch(_){} }
   if (t && t.url){ const f = document.querySelector('.toolpane[data-tool="'+t.id+'"] iframe'); if (f && !f.src) f.src = t.url; }
   if (curView === 'outils'){ updateTitle(); window.scrollTo(0, 0); }
 }
@@ -3014,6 +3218,7 @@ function renderForm(){
     + health
     + (alerts.length ? '<p class="fnote"><b style="color:var(--run)">À surveiller :</b> '+esc(alerts[0].t)+' : '+esc(alerts[0].x)+'</p>' : '');
   renderTire();
+  if (curTool === 'colis') renderColis();
 }
 
 /* ---------- Pression des pneus : algorithme du calculateur Gravel Passion ----------
@@ -3549,7 +3754,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-natation-1';
+const APP_VERSION = '2026-11-08-colis-1';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
