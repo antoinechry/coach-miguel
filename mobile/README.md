@@ -22,4 +22,4 @@ Puis ▶︎ dans Xcode. Sans ça, l'app garde l'ancienne version (pas de bouton 
 - `IS_APP` (index.html) : vrai dans l'app ; coupe la recherche de nouvelle version.
 - « Mot de passe oublié » : le lien de l'e-mail ouvre le site (GitHub Pages), on y choisit le nouveau mot de passe puis on se reconnecte dans l'app.
 - Liens externes (intervals.icu…) : s'ouvrent dans Safari.
-- iPhone seulement, portrait. Icône et écran de démarrage tirés du logo (`resources/icon.svg`).
+- iPhone seulement, portrait. Icône propre à l'app (08/11/2026, piste A « Anneau plein cadre » : fond jusqu'au bord, anneau et M plus épais) : sources `resources/icon.svg` (claire), `icon-dark.svg` (fond transparent, mode sombre) et `icon-tinted.svg` (gris sur noir, mode teinté) → `AppIcon.appiconset` (3 PNG 1024 px, l'icône claire sans transparence). L'écran de démarrage reprend le même dessin. Le site et son favicon gardent le logo d'origine.

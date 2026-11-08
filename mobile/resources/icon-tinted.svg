@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1024" height="1024">
+<!-- Variante teintée : niveaux de gris sur noir, iOS applique la teinte choisie -->
+<rect width="100" height="100" fill="#000000"/>
+<circle cx="50" cy="50" r="33" fill="none" stroke="#2A2A2A" stroke-width="10"/>
+<circle cx="50" cy="50" r="33" fill="none" stroke="#B0B0B0" stroke-width="10" stroke-linecap="round" stroke-dasharray="130 77.3" transform="rotate(-200 50 50)"/>
+<circle cx="50" cy="50" r="33" fill="none" stroke="#6A6A6A" stroke-width="10" stroke-linecap="round" stroke-dasharray="35 172.3" transform="rotate(42 50 50)"/>
+<path d="M37 62 V40 L50 53 L63 40 V62" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
