@@ -381,7 +381,7 @@ section{margin-top:0}
 .tabbar button[aria-current="page"]{color:var(--accent-ink)}
 .tbrand{display:none}
 @media (max-width:899px){
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--surface);border-top:1px solid var(--line);padding:4px 6px max(4px, calc(env(safe-area-inset-bottom) - 10px))}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--surface);border-top:1px solid var(--line);padding:4px 6px max(4px, calc(env(safe-area-inset-bottom) - 10px))}
   body.has-tabs .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   body.has-tabs .newver{bottom:calc(72px + env(safe-area-inset-bottom))}
   .tabbar[hidden]{display:none}
@@ -419,8 +419,8 @@ section{margin-top:0}
   .wrap{max-width:1180px;padding:24px 28px 48px}
 }
 
-/* Vue Météo : page meteo.html dans un cadre */
-.wxframe{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);height:calc(100dvh - 190px - env(safe-area-inset-bottom));min-height:420px}
+/* App Outils « Météo » (08/11/2026, avant vue à part) : page meteo.html dans un cadre */
+.wxframe{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);height:calc(100dvh - 240px - env(safe-area-inset-bottom));min-height:420px}
 .wxframe iframe{display:block;width:100%;height:100%;border:0}
 /* App iPhone (Capacitor) et écran d'accueil : contenu sous la barre d'état */
 body{padding-top:env(safe-area-inset-top)}
@@ -429,9 +429,11 @@ body{padding-top:env(safe-area-inset-top)}
 @media (max-width:899px){
   body.view-meteo.has-tabs header.top{display:none}
   body.view-meteo.has-tabs .wrap{padding:0 0 calc(70px + env(safe-area-inset-bottom));max-width:none}
-  body.view-meteo.has-tabs .wxframe{margin:0;border-radius:0;border:0;height:calc(100dvh - 70px - env(safe-area-inset-bottom));min-height:360px;padding-top:env(safe-area-inset-top)}
+  body.view-meteo.has-tabs .toolpane[data-tool="meteo"] .toolbar{margin:0;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;background:var(--surface);border-bottom:1px solid var(--line)}
+  body.view-meteo.has-tabs .toolpane[data-tool="meteo"] .toolback{min-height:36px}
+  body.view-meteo.has-tabs .wxframe{margin:0;border-radius:0;border:0;height:calc(100dvh - 70px - 49px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-height:340px}
 }
-@media (min-width:900px){.wxframe{height:calc(100dvh - 150px);min-height:520px;width:min(1124px, calc(100vw - 220px - 56px))}}
+@media (min-width:900px){.wxframe{height:calc(100dvh - 200px);min-height:520px;width:min(1124px, calc(100vw - 220px - 56px))}}
 
 /* En-tête */
 header.top{align-items:center}
@@ -881,7 +883,6 @@ dialog{border-radius:20px}
   <button data-view="today" aria-current="page"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></span><span class="tl">Aujourd'hui</span></button>
   <button data-view="cal"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span class="tl">Calendrier</span></button>
   <button data-view="miguel"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><span class="tl">Miguel</span></button>
-  <button data-view="meteo"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.6-8 5.5 5.5 0 0 1 10.6 1.5A3.3 3.3 0 0 1 17 18z"/><path d="M3 21h4M11 21h10"/></svg></span><span class="tl">Météo</span></button>
   <button data-view="prog"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="tl">Progrès</span></button>
   <button data-view="outils"><span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span><span class="tl">Outils</span></button>
   <button class="tmenu" id="sidemenu" aria-haspopup="dialog"><span class="av" id="sideav">?</span><span class="tl">Mon menu</span></button>
@@ -1022,11 +1023,6 @@ dialog{border-radius:20px}
       <div class="pcard" id="mighist"></div>
     </section>
 
-    <section class="view" data-view="meteo" aria-labelledby="h-meteo" hidden>
-      <h2 id="h-meteo" class="vh">Météo</h2>
-      <div class="wxframe"><iframe id="wxframe" title="Miguel Météo : carte du vent, de la pluie, des nuages et de la température" loading="lazy" allow="fullscreen"></iframe></div>
-    </section>
-
     <section class="view" data-view="prog" aria-labelledby="h-prog" hidden>
       <h2 id="h-prog" class="vh">Progrès</h2>
       <div class="loadcard pcard" id="loadcard">
@@ -1055,6 +1051,10 @@ dialog{border-radius:20px}
       <div id="toolhome">
         <p class="sub toolsub">Tes petites apps pour te faciliter la vie. Touche-en une pour l'ouvrir.</p>
         <div class="applaunch" id="applaunch"></div>
+      </div>
+      <div class="toolpane" data-tool="meteo" hidden>
+        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Météo</h3></div>
+        <div class="wxframe"><iframe id="wxframe" title="Miguel Météo : carte du vent, de la pluie, des nuages et de la température" loading="lazy" allow="fullscreen"></iframe></div>
       </div>
       <div class="toolpane" data-tool="pneus" hidden>
       <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Pression des pneus</h3></div>
@@ -3128,25 +3128,25 @@ function renderMissing(list){
 }
 /* ---------- Refonte : 4 vues (Aujourd'hui, Calendrier, Miguel, Progrès) ---------- */
 // Barre du bas sur téléphone, menu latéral sur ordinateur. Vue gardée dans l'adresse (#today…) et localStorage cm-view.
-const VIEWS = ['today', 'cal', 'miguel', 'meteo', 'prog', 'outils'];
-const VIEW_TITLE = { cal: 'Calendrier', miguel: 'Miguel', meteo: 'Météo', prog: 'Progrès', outils: 'Outils' };
+const VIEWS = ['today', 'cal', 'miguel', 'prog', 'outils'];
+const VIEW_TITLE = { cal: 'Calendrier', miguel: 'Miguel', prog: 'Progrès', outils: 'Outils' };
 let curView = 'today';
 function setView(v, keepScroll){
   if (!VIEWS.includes(v)) v = 'today';
   curView = v;
   for (const s of document.querySelectorAll('#app .view')) s.hidden = s.dataset.view !== v;
-  document.body.classList.toggle('view-meteo', v === 'meteo');
+  document.body.classList.toggle('view-meteo', v === 'outils' && typeof curTool !== 'undefined' && curTool === 'meteo');
   for (const b of $('tabbar').querySelectorAll('[data-view]')){ if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   updateTitle();
   try { localStorage.setItem('cm-view', v); } catch(_){}
   if (!/access_token|type=/.test(location.hash) && location.hash !== '#'+v) history.replaceState(null, '', '#'+v);
   if (v === 'prog'){ renderLoad(); if (WELL.days.length) drawHealth(); }
-  if (v === 'meteo') loadWxFrame();
+  if (v === 'outils' && typeof curTool !== 'undefined' && curTool === 'meteo') loadWxFrame();
   if (!keepScroll) window.scrollTo(0, 0);
 }
-// Vue Météo : meteo.html (Miguel Météo) chargée à la première ouverture, centrée sur la ville de « Moi ».
+// App Outils « Météo » : meteo.html (Miguel Météo) chargée à la première ouverture, centrée sur la ville de « Moi ».
 function loadWxFrame(){
-  if (curView !== 'meteo' && !$('wxframe').dataset.src) return;
+  if (!(curView === 'outils' && typeof curTool !== 'undefined' && curTool === 'meteo') && !$('wxframe').dataset.src) return;
   const r = state.reglages || {}, q = new URLSearchParams();
   if (Number.isFinite(+r.lat) && Number.isFinite(+r.lon) && r.lat !== null && r.lon !== null && r.lat !== ''){ q.set('lat', (+r.lat).toFixed(3)); q.set('lon', (+r.lon).toFixed(3)); if (r.ville) q.set('name', r.ville); }
   try { q.set('v', APP_VERSION); } catch(_){}
@@ -3156,8 +3156,9 @@ function loadWxFrame(){
 }
 function initialView(){
   const h = location.hash.slice(1);
+  if (h === 'meteo'){ openTool('meteo'); return 'outils'; }
   if (VIEWS.includes(h)) return h;
-  try { const v = localStorage.getItem('cm-view'); if (VIEWS.includes(v)) return v; } catch(_){}
+  try { const v = localStorage.getItem('cm-view'); if (v === 'meteo'){ openTool('meteo'); return 'outils'; } if (VIEWS.includes(v)) return v; } catch(_){}
   return 'today';
 }
 function updateTitle(){
@@ -3869,6 +3870,8 @@ const AGENDA = (() => {
 
 // Outils : lanceur de petites apps. Pour en ajouter une : une entrée dans TOOLS + un <div class="toolpane" data-tool="<id>"> dans la vue Outils.
 const TOOLS = [
+  { id: 'meteo', name: 'Météo', title: 'Miguel Météo', color: '#3A87B0',
+    icon: '<path d="M7 18a4 4 0 0 1-.6-8 5.5 5.5 0 0 1 10.6 1.5A3.3 3.3 0 0 1 17 18z"/><path d="M3 21h4M11 21h10"/>' },
   { id: 'pneus', name: 'Pression pneus', title: 'Pression des pneus', color: '#2A6A5B',
     icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/>' },
   { id: 'agenda', name: 'Agenda réseaux', title: 'Agenda des publications', color: '#B8501F',
@@ -3889,6 +3892,8 @@ function openTool(id){
   if (t && t.id === 'pneus' && state.user){ try { renderTire(); } catch(_){} }
   if (t && t.id === 'colis' && state.user){ try { renderColis(); } catch(_){} }
   if (t && t.id === 'agenda') AGENDA.open();
+  document.body.classList.toggle('view-meteo', curView === 'outils' && curTool === 'meteo');
+  if (t && t.id === 'meteo') loadWxFrame();
   if (curView === 'outils'){ updateTitle(); window.scrollTo(0, 0); }
 }
 renderLauncher();
@@ -4515,7 +4520,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-agenda-frise';
+const APP_VERSION = '2026-11-08-meteo-outils';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
