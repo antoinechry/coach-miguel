@@ -993,14 +993,13 @@ dialog{border-radius:20px}
       </div>
       </div>
       <div class="toolpane ag" data-tool="agenda" hidden>
-        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Agenda des publications</h3><button class="toolext" type="button" id="aglockbtn" hidden>Verrouiller</button></div>
+        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Agenda des publications</h3><button class="toolext" type="button" id="aglockbtn" hidden>Importer l'ancien agenda</button></div>
         <form class="pcard aglock" id="aglock" autocomplete="off" hidden>
-          <h3>Agenda des publications</h3>
-          <p class="sub">Contenu chiffré : entre le mot de passe de l'agenda.</p>
+          <h3>Importer l'ancien agenda</h3>
+          <p class="sub">Ancien agenda chiffré (GitHub) : entre son mot de passe une seule fois, les publications sont copiées dans l'app.</p>
           <label class="agfield">Mot de passe<input type="password" id="agpw" autocomplete="current-password" required></label>
-          <label class="agchk"><input type="checkbox" id="agremember" checked> Se souvenir sur cet appareil</label>
           <p class="msg" id="agerr" role="alert"></p>
-          <button class="btn primary" type="submit" id="agunlock">Ouvrir l'agenda</button>
+          <button class="btn primary" type="submit" id="agunlock">Importer</button>
         </form>
         <p class="msg" id="agload" hidden>Ouverture de l'agenda…</p>
         <div id="agapp" hidden>
@@ -3258,7 +3257,7 @@ const AGENDA = (() => {
   const monday = d => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay()+6) % 7)); return x; };
   const todayISO = () => iso(new Date());
 
-  let KEY = null, DATA = null, wired = false, booted = false, jszipP = null;
+  let KEY = null, DATA = null, wired = false, jszipP = null;
   const ST = { view: 'agenda', projects: ls.get('agenda.proj', []), past: ls.get('agenda.past', false), month: null };
   let done = ls.get('agenda.done', {});
   const blobCache = new Map(), urlCache = new Map(), READY = new Map();
@@ -3288,57 +3287,91 @@ const AGENDA = (() => {
     if (!r.ok) throw new Error('nodata');
     return JSON.parse(new TextDecoder().decode(await decrypt(await r.arrayBuffer())));
   }
+  // Un visuel est soit dans le stockage privé Supabase (m.path, dossier <user_id>/…), soit dans l'ancien agenda chiffré (m.file).
+  const mk_ = m => m.path || m.file;
   function mediaBlob(m){
-    if (!blobCache.has(m.file)) blobCache.set(m.file, (async () => {
+    const k = mk_(m);
+    if (!blobCache.has(k)) blobCache.set(k, (async () => {
+      if (m.path){
+        const { data, error } = await sb.storage.from('agenda').download(m.path);
+        if (error) throw error;
+        return data.type ? data : new Blob([data], { type: m.type });
+      }
+      if (!KEY) throw new Error('media');
       const r = await fetch(BASE + m.file + V);
       if (!r.ok) throw new Error('media');
       return new Blob([await decrypt(await r.arrayBuffer())], { type: m.type });
     })());
-    return blobCache.get(m.file);
+    return blobCache.get(k);
   }
   function mediaURL(m){
-    if (!urlCache.has(m.file)) urlCache.set(m.file, mediaBlob(m).then(b => URL.createObjectURL(b)));
-    return urlCache.get(m.file);
+    const k = mk_(m);
+    if (!urlCache.has(k)) urlCache.set(k, mediaBlob(m).then(b => URL.createObjectURL(b)));
+    return urlCache.get(k);
+  }
+  // Publications : table agenda_items (RLS par utilisateur). kind = project | post | story, data = l'objet complet.
+  async function loadRows(){
+    const { data, error } = await sb.from('agenda_items').select('id,kind,date,data').order('date', { ascending:true }).limit(5000);
+    if (error) throw error;
+    const D = { projects:[], posts:[], stories:[] };
+    for (const r of data || []){
+      const o = Object.assign({}, r.data, { id: r.id });
+      if (r.kind === 'project') o.id = r.data.id || r.id;
+      if (r.date && !o.date) o.date = r.date;
+      (r.kind === 'project' ? D.projects : r.kind === 'story' ? D.stories : D.posts).push(o);
+    }
+    return D;
+  }
+  let reloadT = null;
+  function watch(){
+    if (watch.on) return; watch.on = true;
+    sb.channel('agenda-live').on('postgres_changes', { event:'*', schema:'public', table:'agenda_items' }, () => {
+      clearTimeout(reloadT);
+      reloadT = setTimeout(async () => { try { DATA = await loadRows(); if (!g('agapp').hidden) render(); } catch(e){} }, 400);
+    }).subscribe();
+  }
+  async function importLegacy(){
+    const old = await loadData();   // ancien agenda chiffré : échoue (OperationError) si le mot de passe est faux
+    const rows = [];
+    old.projects.forEach(p => rows.push({ id:'project-'+p.id, kind:'project', date:null, data:p }));
+    old.posts.forEach(p => rows.push({ id:p.id, kind:'post', date:p.date, data:p }));
+    old.stories.forEach((st, i) => { const id = st.id || ('story-'+st.project+'-'+st.date+'-'+i); rows.push({ id, kind:'story', date:st.date, data:Object.assign({}, st, { id }) }); });
+    for (let i = 0; i < rows.length; i += 100){
+      const { error } = await sb.from('agenda_items').upsert(rows.slice(i, i+100).map(r => Object.assign({ user_id:state.user.id, updated_at:new Date().toISOString() }, r)), { onConflict:'user_id,id' });
+      if (error) throw error;
+    }
+    return rows.length;
   }
 
   // ----- état d'écran
   function show(which){
     g('aglock').hidden = which !== 'lock';
     g('agload').hidden = which !== 'load';
-    g('agapp').hidden = which !== 'app';
-    g('aglockbtn').hidden = which !== 'app';
+    g('agapp').hidden = which === 'load';
+    g('aglockbtn').hidden = which === 'load';
+  }
+  async function legacyKey(){
+    if (KEY) return;
+    const k = ls.get('agenda.key', null) || (state.reglages && state.reglages.agenda && state.reglages.agenda.key) || null;
+    if (!k) return;
+    try { KEY = await crypto.subtle.importKey('raw', b64(k), { name:'AES-GCM' }, true, ['decrypt']); } catch(e){ KEY = null; }
   }
   async function open(){
     wire();
-    if (DATA){ render(); show('app'); return; }
-    if (booted) return;
-    booted = true;
-    // Clé gardée sur l'appareil, sinon dans les réglages privés (Supabase, derrière la connexion) : le mot de passe n'est demandé qu'une fois pour tous les appareils.
-    const k = ls.get('agenda.key', null) || (state.reglages && state.reglages.agenda && state.reglages.agenda.key) || null;
-    if (!k){ show('lock'); return; }
-    show('load');
-    try {
-      KEY = await crypto.subtle.importKey('raw', b64(k), { name:'AES-GCM' }, true, ['decrypt']);
-      DATA = await loadData();
-      show('app'); render();
-    } catch(e){
-      KEY = null;
-      if (e.message === 'nodata'){ g('agerr').textContent = "Aucune donnée publiée pour l'instant."; }
-      else if (e.name === 'OperationError'){ ls.del('agenda.key'); try { if (state.reglages && state.reglages.agenda){ delete state.reglages.agenda; saveDoc('reglages', state.reglages); } } catch(e2){} }
-      else g('agerr').textContent = 'Agenda injoignable (réseau ?). Réessaie.';
-      booted = false;
-      show('lock');
-    }
-  }
-  async function unlock(pw, remember){
-    try { KEY = await deriveKey(pw); DATA = await loadData(); } catch(e){ KEY = null; DATA = null; throw e; }
-    if (remember){
-      const raw = await crypto.subtle.exportKey('raw', KEY);
-      const k = btoa(String.fromCharCode(...new Uint8Array(raw)));
-      ls.set('agenda.key', k);
-      try { if (state.reglages){ state.reglages.agenda = { key: k }; saveDoc('reglages', state.reglages); } } catch(e){}
-    }
+    if (!DATA) show('load');
+    try { await legacyKey(); DATA = await loadRows(); watch(); }
+    catch(e){ if (!DATA){ g('agload').textContent = "Agenda injoignable (réseau ?). Rouvre l'outil pour réessayer."; return; } }
     show('app'); render();
+  }
+  async function unlock(pw){
+    KEY = await deriveKey(pw);
+    const raw = await crypto.subtle.exportKey('raw', KEY);
+    const k = btoa(String.fromCharCode(...new Uint8Array(raw)));
+    const n = await importLegacy();
+    ls.set('agenda.key', k);
+    try { if (state.reglages){ state.reglages.agenda = { key: k }; saveDoc('reglages', state.reglages); } } catch(e){}
+    DATA = await loadRows(); show('app'); render();
+    return n;
   }
 
   // ----- helpers de données
@@ -3560,16 +3593,11 @@ const AGENDA = (() => {
     g('aglock').addEventListener('submit', async ev => {
       ev.preventDefault(); const err = g('agerr'), btn = g('agunlock');
       err.textContent = ''; btn.disabled = true; btn.textContent = 'Ouverture…';
-      try { await unlock(g('agpw').value, g('agremember').checked); g('agpw').value = ''; }
+      try { const n = await unlock(g('agpw').value); g('agpw').value = ''; toast(n+" éléments importés dans l'app"); }
       catch(e){ err.textContent = e.message === 'nodata' ? "Aucune donnée publiée pour l'instant." : e.name === 'OperationError' ? 'Mot de passe incorrect.' : 'Agenda injoignable (réseau ?).'; }
-      finally { btn.disabled = false; btn.textContent = "Ouvrir l'agenda"; }
+      finally { btn.disabled = false; btn.textContent = 'Importer'; }
     });
-    g('aglockbtn').addEventListener('click', () => {
-      ls.del('agenda.key'); try { if (state.reglages && state.reglages.agenda){ delete state.reglages.agenda; saveDoc('reglages', state.reglages); } } catch(e){}
-      KEY = null; DATA = null; booted = true; blobCache.clear(); READY.clear();
-      urlCache.forEach(p => p.then(u => URL.revokeObjectURL(u)).catch(() => {})); urlCache.clear();
-      g('agmain').innerHTML = ''; show('lock');
-    });
+    g('aglockbtn').addEventListener('click', () => { g('aglock').hidden = !g('aglock').hidden; });
     g('agics').addEventListener('click', exportICS);
     g('agcsv').addEventListener('click', exportCSV);
     g('agpast').addEventListener('change', e => { ST.past = e.target.checked; ls.set('agenda.past', ST.past); render(); });
@@ -4277,7 +4305,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-agenda-natif-2';
+const APP_VERSION = '2026-11-08-agenda-supabase';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
