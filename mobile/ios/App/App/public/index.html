@@ -634,6 +634,81 @@ body.has-tabs h1{font-size:clamp(1.4rem,3.6vw,1.9rem);font-stretch:108%}
 @media (max-width:640px){.aglb .agnav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5)}.aglb .agprev{left:0}.aglb .agnext{right:0}}
 .agtoast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:650;font-size:.88rem;z-index:90;max-width:calc(100vw - 32px)}
 .agtoast[hidden]{display:none}
+/* Agenda : vue Frise (08/11/2026) — une frise chronologique par projet, miniatures au-dessus, stories en dessous */
+.wrap:has(.agfbox){width:100%;box-sizing:border-box}
+.ag .agfnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0 10px}
+.ag .agfnav .btn{min-height:40px;min-width:44px}
+.ag .agfper{font-weight:750;min-width:150px;text-align:center}
+.ag .agfbox{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-width:0;contain:inline-size}
+.ag .agfscroll{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.ag .agfwrap{position:relative;padding-top:34px}
+.ag .agftoday{position:absolute;top:28px;bottom:0;width:0;border-left:2px dashed var(--c-hr);z-index:1;pointer-events:none}
+.ag .agftlab{position:absolute;top:6px;transform:translateX(-50%);z-index:4;font-size:.72rem;font-weight:700;color:#fff;background:#B7323F;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.ag .agflane{--tint:var(--surface-2);--line2:var(--line);--dark:var(--ink);--deep:var(--c);padding:12px 0 4px;border-bottom:1px solid var(--line)}
+@supports (color:color-mix(in srgb,red,blue)){.ag .agflane{--tint:color-mix(in srgb,var(--c) 13%,var(--surface));--line2:color-mix(in srgb,var(--c) 38%,var(--surface));--dark:color-mix(in srgb,var(--c) 66%,var(--ink));--deep:color-mix(in srgb,var(--c) 70%,#000)}}
+.ag .agflane:last-child{border-bottom:0}
+.ag .agfhead{position:sticky;left:0;z-index:3;width:max-content;max-width:var(--vw,100%);box-sizing:border-box;padding:2px 16px;background:var(--surface);display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.ag .agfav{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:.72rem;font-weight:800;background:var(--tint);color:var(--dark);border:1px solid var(--line2);flex:none}
+.ag .agfname{font-weight:800;font-size:1.02rem}
+.ag .agfinfo{font-size:.8rem;color:var(--muted)}
+.ag .agfnext{font-size:.8rem}
+.ag .agfwarn{font-size:.75rem;font-weight:650;color:var(--court-ink);background:var(--court);border-radius:999px;padding:2px 9px}
+.ag .agfstage{position:relative;height:284px}
+.ag .agfbar{position:absolute;top:206px;height:28px;display:flex}
+.ag .agfseg{flex:1 1 0;min-width:0;display:flex;align-items:center;padding-left:10px;font-size:.74rem;font-weight:700;white-space:nowrap;overflow:hidden;color:var(--dark);background:var(--tint);border:1px solid var(--line2);border-right:0}
+.ag .agfseg:first-child{border-radius:8px 0 0 8px}
+.ag .agfseg:nth-child(even){background:var(--line2)}
+.ag .agfarrow{flex:none;width:26px;height:36px;margin-top:-4px;fill:var(--c)}
+.ag .agftick{position:absolute;top:228px;width:1px;height:6px;background:var(--dark);opacity:.35}
+.ag .agfstem{position:absolute;top:190px;width:2px;height:16px;margin-left:-1px;background:var(--dark)}
+.ag .agfcol{position:absolute;bottom:94px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ag .agfthumbs{display:flex;gap:4px;align-items:flex-end}
+.ag .agfth{all:unset;box-sizing:border-box;cursor:pointer;position:relative;flex:none;border-radius:6px}
+.ag .agfth.car{margin-top:7px}
+.ag .agfth.car::before,.ag .agfth.car::after{content:"";position:absolute;border-radius:6px}
+.ag .agfth.car::before{left:7px;top:-7px;right:-7px;bottom:7px;background:var(--line2)}
+.ag .agfth.car::after{left:3.5px;top:-3.5px;right:-3.5px;bottom:3.5px;background:var(--c);opacity:.55}
+.ag .agftile{position:absolute;inset:0;z-index:1;border-radius:6px;overflow:hidden;background:var(--deep);color:#fff;display:flex;flex-direction:column;padding:5px;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.ag .agftile b{margin-top:auto;font-size:8.5px;font-weight:800;line-height:1.15;text-transform:uppercase;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.ag .agftile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--deep)}
+.ag .agftile img:not([src]){visibility:hidden}
+.ag .agfbadge{position:absolute;z-index:2;right:4px;top:4px;font-size:9px;font-weight:700;line-height:1.3;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:0 4px}
+.ag .agfplay{position:absolute;z-index:2;inset:0;display:grid;place-items:center;pointer-events:none}
+.ag .agfplay svg{width:22px;height:22px;fill:#fff;opacity:.92;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.ag .agfok{position:absolute;z-index:2;left:-5px;top:-5px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface)}
+.ag .agfok svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:3.2}
+.ag .agfth.past{opacity:.6}
+.ag .agfth.sel,.ag .agfth:focus-visible{outline:3px solid var(--focus);outline-offset:3px;opacity:1}
+.ag .agfcap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1px;width:100%}
+.ag .agfwhen{display:flex;flex-wrap:wrap;justify-content:center;column-gap:4px;font-size:.68rem;font-weight:700;line-height:1.25;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.ag .agfwhen span{white-space:nowrap}
+.ag .agfttl{font-size:.72rem;font-weight:700;line-height:1.22;color:var(--dark);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.ag .agfst{all:unset;box-sizing:border-box;cursor:pointer;position:absolute;top:246px;width:32px;height:32px;margin-left:-16px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:800;color:var(--dark);background:var(--tint);border:2.4px dashed var(--c);z-index:2}
+.ag .agfst::before{content:"";position:absolute;left:50%;top:-14px;width:2px;height:12px;margin-left:-1px;background:var(--line2)}
+.ag .agfst.past{opacity:.55}.ag .agfst.done{opacity:.4}
+.ag .agfst.sel,.ag .agfst:focus-visible{outline:3px solid var(--focus);outline-offset:2px;opacity:1}
+.ag .agflegend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:9px 16px;border-top:1px solid var(--line);font-size:.78rem;color:var(--muted)}
+.ag .agflegend span{display:inline-flex;align-items:center;gap:6px}
+.ag .agflegend svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+.ag .agfdetail{margin-top:14px}
+.ag .agfdetail:empty{display:none}
+.ag .agfdh{margin:0 0 10px;font-size:1.02rem}
+.ag .agfdetail .agstories{display:grid;gap:8px}
+@media (max-width:640px){
+  .ag .agfstage{height:212px}
+  .ag .agfbar{top:150px;height:20px}
+  .ag .agfseg{font-size:.64rem;padding-left:7px}
+  .ag .agfarrow{width:18px;height:26px;margin-top:-3px}
+  .ag .agftick{top:166px;height:4px}
+  .ag .agfstem{top:138px;height:12px}
+  .ag .agfcol{bottom:74px;gap:4px}
+  .ag .agfst{top:182px;width:26px;height:26px;margin-left:-13px;font-size:.66rem;border-width:2px}
+  .ag .agfst::before{top:-12px;height:10px}
+  .ag .agftile{padding:4px}.ag .agftile b{font-size:7px}
+  .ag .agfwhen{font-size:.6rem}.ag .agfttl{font-size:.66rem;-webkit-line-clamp:2}
+  .ag .agfhead{padding:0 12px}.ag .agfname{font-size:.95rem}
+  .ag .agflegend{font-size:.72rem;padding:8px 12px}
+}
 /* Suivi de colis (08/11/2026) */
 .cxadd h3{margin:0 0 10px}
 .cxgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -1004,11 +1079,11 @@ dialog{border-radius:20px}
         <p class="msg" id="agload" hidden>Ouverture de l'agenda…</p>
         <div id="agapp" hidden>
           <div class="agtop">
-            <div class="seg2 agseg" role="group" aria-label="Vue de l'agenda"><button type="button" data-agview="agenda" aria-pressed="true">Agenda</button><button type="button" data-agview="mois" aria-pressed="false">Mois</button></div>
+            <div class="seg2 agseg" role="group" aria-label="Vue de l'agenda"><button type="button" data-agview="frise" aria-pressed="true">Frise</button><button type="button" data-agview="agenda" aria-pressed="false">Liste</button><button type="button" data-agview="mois" aria-pressed="false">Mois</button></div>
             <span class="agstats" id="agstats"></span>
           </div>
           <div class="agchips" id="agprojects"></div>
-          <div class="agopts"><label class="agchk"><input type="checkbox" id="agpast"> Publications passées</label><span class="agexp"><button class="btn" type="button" id="agics">Exporter (.ics)</button><button class="btn" type="button" id="agcsv">CSV</button></span></div>
+          <div class="agopts"><label class="agchk" id="agpastw"><input type="checkbox" id="agpast"> Publications passées</label><span class="agexp"><button class="btn" type="button" id="agics">Exporter (.ics)</button><button class="btn" type="button" id="agcsv">CSV</button></span></div>
           <div id="agmain"></div>
         </div>
       </div>
@@ -3258,7 +3333,8 @@ const AGENDA = (() => {
   const todayISO = () => iso(new Date());
 
   let KEY = null, DATA = null, wired = false, jszipP = null;
-  const ST = { view: 'agenda', projects: ls.get('agenda.proj', []), past: ls.get('agenda.past', false), month: null };
+  const ST = { view: ls.get('agenda.view', 'frise'), projects: ls.get('agenda.proj', []), past: ls.get('agenda.past', false), month: null, fstart: null, fsel: null };
+  if (!['frise','agenda','mois'].includes(ST.view)) ST.view = 'frise';
   let done = ls.get('agenda.done', {});
   const blobCache = new Map(), urlCache = new Map(), READY = new Map();
 
@@ -3395,7 +3471,8 @@ const AGENDA = (() => {
     g('agpast').checked = ST.past;
     const posts = DATA.posts.filter(visible), n = posts.filter(p => done[p.id]).length;
     g('agstats').innerHTML = '<b>'+n+'</b> / '+posts.length+' publiées';
-    ST.view === 'agenda' ? renderAgenda() : renderMonth();
+    g('agpastw').hidden = ST.view !== 'agenda';
+    ST.view === 'agenda' ? renderAgenda() : ST.view === 'mois' ? renderMonth() : renderFrise();
   }
   function music(m){
     if (!m || !(m.pick || []).length) return '';
@@ -3447,9 +3524,7 @@ const AGENDA = (() => {
         h += '<div class="agday'+(d === tod ? ' today' : '')+'" id="agd-'+d+'" data-n="'+dt.getDate()+'"><div class="agdl">'+DAYS[dt.getDay()]+' '+dt.getDate()+' '+MONTHS[dt.getMonth()]+(d === tod ? '<em>Aujourd\'hui</em>' : '')+'</div>';
         for (const p of posts.filter(x => x.date === d)) h += card(p);
         const ss = stories.filter(s => s.date === d);
-        if (ss.length) h += '<div class="agstories">' + ss.map(s => '<div class="agstory'+(done[skey(s)] ? ' done' : '')+'" style="--c:'+esc(proj(s.project).color)+'"><span class="agdot"></span><span class="agtag">Story</span>'+esc(s.text) +
-          slinks(s).map(l => '<span class="agstl">🔗 '+(l.label ? esc(l.label)+' : ' : '')+esc(l.url)+'</span>').join('') + music(s.music) + stMedia(s) +
-          '<label class="agchk agstchk"><input type="checkbox" data-agdone="'+esc(skey(s))+'" '+(done[skey(s)] ? 'checked' : '')+'> Publié</label></div>').join('') + '</div>';
+        if (ss.length) h += '<div class="agstories">' + ss.map(storyHTML).join('') + '</div>';
         h += '</div>';
       }
       h += '</div></section>';
@@ -3470,6 +3545,133 @@ const AGENDA = (() => {
     }
     h += '</div></section>'; g('agmain').innerHTML = h;
   }
+  function storyHTML(s){
+    return '<div class="agstory'+(done[skey(s)] ? ' done' : '')+'" style="--c:'+esc(proj(s.project).color)+'"><span class="agdot"></span><span class="agtag">Story</span>'+esc(s.text) +
+      slinks(s).map(l => '<span class="agstl">🔗 '+(l.label ? esc(l.label)+' : ' : '')+esc(l.url)+'</span>').join('') + music(s.music) + stMedia(s) +
+      '<label class="agchk agstchk"><input type="checkbox" data-agdone="'+esc(skey(s))+'" '+(done[skey(s)] ? 'checked' : '')+'> Publié</label></div>';
+  }
+
+  // ----- vue Frise (08/11/2026) : une frise chronologique par projet sur 2 semaines (lundi → dimanche + 7).
+  // Miniatures des publications au-dessus de la flèche (tige + point), bulles des stories en dessous, ligne « Aujourd'hui ».
+  // Toucher une miniature ou une bulle ouvre sa fiche sous les frises (ST.fsel = 'p:<id>' | 's:<projet>|<date>').
+  const MS = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  const FR = { reset: true, w: 0 };
+  const FR_DAYS = 14;
+  const byDT = (a, b) => (a.date+(a.time || '')).localeCompare(b.date+(b.time || ''));
+  const isoWeek = d => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const wd = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - wd); return Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7); };
+  const dayLab = k => { const d = pd(k); return DAYS[d.getDay()]+' '+d.getDate(); };
+  const initials = n => (String(n).match(/[A-ZÀ-ÖØ-Ý0-9]/g) || [String(n).charAt(0).toUpperCase()]).slice(0, 3).join('');
+  const FMT_NAME = { carrousel:'Carrousel', reel:'Reel', story:'Story', post:'Post' };
+  const friseStart = () => ST.fstart || iso(monday(new Date()));
+  function friseSelOk(){
+    if (!ST.fsel) return false;
+    if (ST.fsel.startsWith('p:')){ const p = DATA.posts.find(x => x.id === ST.fsel.slice(2)); return !!p && visible(p); }
+    const [pr, d] = ST.fsel.slice(2).split('|');
+    return (!ST.projects.length || ST.projects.includes(pr)) && DATA.stories.some(s => s.project === pr && s.date === d);
+  }
+  function friseDefaultSel(){
+    const posts = DATA.posts.filter(visible).sort(byDT), tod = todayISO();
+    const p = posts.find(x => x.date >= tod) || posts[posts.length - 1];
+    return p ? 'p:'+p.id : null;
+  }
+  function friseDetail(){
+    if (!ST.fsel) return '';
+    if (ST.fsel.startsWith('p:')){ const p = DATA.posts.find(x => x.id === ST.fsel.slice(2)); return p ? card(p) : ''; }
+    const [pr, d] = ST.fsel.slice(2).split('|'), dt = pd(d);
+    const ss = DATA.stories.filter(s => s.project === pr && s.date === d);
+    return ss.length ? '<h4 class="agfdh">Stories · '+esc(proj(pr).name)+' · '+DAYS[dt.getDay()]+' '+dt.getDate()+' '+MONTHS[dt.getMonth()]+'</h4><div class="agstories">'+ss.map(storyHTML).join('')+'</div>' : '';
+  }
+  function friseThumb(p, w, h, tod){
+    const f = p.format || 'post', n = (p.media || []).length;
+    const car = f === 'carrousel' || (n > 1 && f !== 'reel' && f !== 'story');
+    const vid = (p.media || []).some(m => (m.type || '').startsWith('video'));
+    const sel = ST.fsel === 'p:'+p.id, pr = proj(p.project);
+    const label = (FMT_NAME[f] || f)+' '+pr.name+', '+dayLab(p.date)+(p.time ? ' à '+p.time : '')+' : '+p.title+(done[p.id] ? ' (publié)' : '');
+    return '<button type="button" class="agfth'+(car ? ' car' : '')+(p.date < tod ? ' past' : '')+(sel ? ' sel' : '')+'" data-agfsel="'+esc(p.id)+'" style="width:'+w+'px;height:'+h+'px" aria-pressed="'+sel+'" aria-label="'+esc(label)+'">' +
+      '<span class="agftile"><b>'+esc(p.title)+'</b>'+(p.thumb ? '<img alt="" data-agthumb="'+esc(p.id)+'">' : '')+'</span>' +
+      (car && n > 1 ? '<span class="agfbadge">'+n+'</span>' : '') +
+      (vid ? '<span class="agfplay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span>' : '') +
+      (done[p.id] ? '<span class="agfok" title="Publié"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' : '') + '</button>';
+  }
+  function renderFrise(){
+    const main = g('agmain'), old = main.querySelector('.agfscroll');
+    const keep = !FR.reset && old ? old.scrollLeft : null;
+    FR.reset = false;
+    const tod = todayISO(), start = pd(friseStart());
+    const days = Array.from({ length: FR_DAYS }, (_, i) => { const d = new Date(start); d.setDate(start.getDate()+i); return iso(d); });
+    const first = days[0], last = days[FR_DAYS-1], ti = days.indexOf(tod);
+    const compact = matchMedia('(max-width:640px)').matches;
+    const W = Math.max(300, main.clientWidth || 360); FR.w = W;
+    const padL = compact ? 10 : 22, arrow = compact ? 18 : 26;
+    const dw = Math.max(compact ? 64 : 72, Math.floor((W - 2 - padL - arrow - 16) / FR_DAYS));
+    const x = i => padL + i*dw + dw/2;
+    const stageW = padL + FR_DAYS*dw + arrow + 16;
+    const SZ = compact ? { reel:[46,82], story:[46,82], post:[54,54], carrousel:[52,65] } : { reel:[58,103], story:[58,103], post:[68,68], carrousel:[66,82] };
+    if (!friseSelOk()) ST.fsel = friseDefaultSel();
+    const a = pd(first), b = pd(last);
+    const per = a.getMonth() === b.getMonth() ? a.getDate()+' – '+b.getDate()+' '+MS[b.getMonth()]+' '+b.getFullYear() : a.getDate()+' '+MS[a.getMonth()]+' – '+b.getDate()+' '+MS[b.getMonth()]+' '+b.getFullYear();
+    let h = '<div class="agfnav"><button class="btn" type="button" data-agfnav="-7" aria-label="Semaine précédente">‹</button><span class="agfper">'+per+'</span><button class="btn" type="button" data-agfnav="7" aria-label="Semaine suivante">›</button><button class="btn" type="button" data-agfnav="0">Aujourd\'hui</button></div>';
+    const lanes = DATA.projects.filter(p => !ST.projects.length || ST.projects.includes(p.id));
+    h += '<div class="agfbox"><div class="agfscroll"><div class="agfwrap" style="width:'+stageW+'px;--vw:'+(W-2)+'px">';
+    if (ti >= 0) h += '<div class="agftoday" style="left:'+(x(ti)-1)+'px"></div><span class="agftlab" style="left:'+x(ti)+'px">Aujourd\'hui · '+dayLab(tod)+'</span>';
+    if (!lanes.length) h += '<p class="agempty" style="padding:0 16px 16px">Aucun projet pour ce filtre.</p>';
+    for (const pr of lanes){
+      const posts = DATA.posts.filter(p => p.project === pr.id && p.date >= first && p.date <= last).sort(byDT);
+      const sts = DATA.stories.filter(s => s.project === pr.id && s.date >= first && s.date <= last);
+      const next = DATA.posts.filter(p => p.project === pr.id && p.date >= tod).sort(byDT)[0];
+      const lastD = [...DATA.posts, ...DATA.stories].filter(x => x.project === pr.id).map(x => x.date).sort().pop();
+      const left = lastD ? Math.round((pd(lastD) - pd(tod)) / 864e5) : -1;
+      const warn = left < 0 ? 'Rien de prévu' : left < 5 ? 'Plus rien après le '+pd(lastD).getDate()+' '+MS[pd(lastD).getMonth()] : '';
+      h += '<div class="agflane" style="--c:'+esc(pr.color)+'"><div class="agfhead"><span class="agfav" aria-hidden="true">'+esc(initials(pr.name))+'</span><span class="agfname">'+esc(pr.name)+'</span>' +
+        '<span class="agfinfo">'+posts.length+' post'+(posts.length > 1 ? 's' : '')+' · '+sts.length+' stor'+(sts.length > 1 ? 'ies' : 'y')+' sur la période</span>' +
+        (next ? '<span class="agfnext">Prochain : <b>'+esc(dayLab(next.date)+(next.time ? ' · '+next.time : '')+' · '+next.title)+'</b></span>' : '') +
+        (warn ? '<span class="agfwarn">'+warn+'</span>' : '') + '</div><div class="agfstage">';
+      h += '<div class="agfbar" style="left:'+padL+'px;width:'+(FR_DAYS*dw + arrow)+'px">';
+      for (let w = 0; w < FR_DAYS; w += 7){
+        const ws = pd(days[w]), we = pd(days[Math.min(w+6, FR_DAYS-1)]);
+        h += '<span class="agfseg">'+(compact ? 'Sem. '+isoWeek(ws) : 'Semaine '+isoWeek(ws)+' · '+ws.getDate()+(ws.getMonth() !== we.getMonth() ? ' '+MS[ws.getMonth()] : '')+' – '+we.getDate()+' '+MS[we.getMonth()])+'</span>';
+      }
+      h += '<svg class="agfarrow" viewBox="0 0 26 36" aria-hidden="true"><path d="M0 4L24 18L0 32Z"/></svg></div>';
+      for (let i = 1; i < FR_DAYS; i++) h += '<span class="agftick" style="left:'+(padL + i*dw)+'px"></span>';
+      days.forEach((d, i) => {
+        const list = posts.filter(p => p.date === d);
+        if (list.length){
+          const colW = dw - 4, nat = list.map(p => SZ[p.format] || SZ.post);
+          const sc = Math.min(1, (colW - 4*(list.length-1)) / nat.reduce((s, [w]) => s + w, 0));
+          const times = list.map(p => p.time).filter(Boolean).join(', ');
+          h += '<span class="agfstem" style="left:'+x(i)+'px"></span>' +
+            '<div class="agfcol" style="left:'+(x(i) - colW/2)+'px;width:'+colW+'px"><div class="agfthumbs">' +
+            list.map((p, j) => friseThumb(p, Math.round(nat[j][0]*sc), Math.round(nat[j][1]*sc), tod)).join('') + '</div>' +
+            '<div class="agfcap"><span class="agfwhen"><span>'+esc(dayLab(d))+'</span>'+(times ? '<span>'+esc(times)+'</span>' : '')+'</span><span class="agfttl">'+esc(list[0].title)+(list.length > 1 ? ' + '+(list.length-1)+' autre'+(list.length > 2 ? 's' : '') : '')+'</span></div></div>';
+        }
+        const ss = sts.filter(s => s.date === d);
+        if (ss.length){
+          const sel = ST.fsel === 's:'+pr.id+'|'+d, all = ss.every(s => done[skey(s)]);
+          h += '<button type="button" class="agfst'+(d < tod ? ' past' : '')+(all ? ' done' : '')+(sel ? ' sel' : '')+'" data-agfst="'+esc(pr.id+'|'+d)+'" style="left:'+x(i)+'px" aria-pressed="'+sel+'" aria-label="'+esc(ss.length+' stor'+(ss.length > 1 ? 'ies' : 'y')+' '+pr.name+', '+dayLab(d))+'" title="'+esc(ss.map(s => s.text).join(' · '))+'">'+(ss.length > 1 ? ss.length : '')+'</button>';
+        }
+      });
+      h += '</div></div>';
+    }
+    h += '</div></div><div class="agflegend">' +
+      '<span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>Carrousel</span>' +
+      '<span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M10 8.5v7l6-3.5z"/></svg>Reel, vidéo</span>' +
+      '<span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>Post</span>' +
+      '<span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-dasharray="5 3"/></svg>Stories du jour</span>' +
+      '<span>Toucher une miniature pour ouvrir la publication</span></div></div>';
+    h += '<div class="agfdetail" id="agfdetail">'+friseDetail()+'</div>';
+    main.innerHTML = h;
+    const sc = main.querySelector('.agfscroll');
+    if (keep !== null) sc.scrollLeft = keep;
+    else if (ti >= 0 && x(ti) > W * 0.6) sc.scrollLeft = Math.max(0, x(ti) - W * 0.3);
+    loadThumbs();
+  }
+  function friseSelect(t){
+    document.querySelectorAll('.agfth.sel,.agfst.sel').forEach(e => { e.classList.remove('sel'); e.setAttribute('aria-pressed', 'false'); });
+    t.classList.add('sel'); t.setAttribute('aria-pressed', 'true');
+    const box = g('agfdetail'); box.innerHTML = friseDetail(); loadThumbs();
+    if (matchMedia('(max-width:900px)').matches) box.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
   function loadThumbs(){
     const mk = fn => new IntersectionObserver(es => es.forEach(async e => {
       if (!e.isIntersecting) return;
@@ -3600,6 +3802,10 @@ const AGENDA = (() => {
       finally { btn.disabled = false; btn.textContent = 'Importer'; }
     });
     g('aglockbtn').addEventListener('click', () => { g('aglock').hidden = !g('aglock').hidden; });
+    let rzT = null;
+    window.addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(() => {
+      if (DATA && ST.view === 'frise' && !g('agapp').hidden && g('agmain').clientWidth && Math.abs(g('agmain').clientWidth - FR.w) > 20) render();
+    }, 200); });
     g('agics').addEventListener('click', exportICS);
     g('agcsv').addEventListener('click', exportCSV);
     g('agpast').addEventListener('change', e => { ST.past = e.target.checked; ls.set('agenda.past', ST.past); render(); });
@@ -3620,8 +3826,10 @@ const AGENDA = (() => {
       done[c.dataset.agdone] = c.checked; ls.set('agenda.done', done); render();
     });
     q('.toolpane[data-tool="agenda"]').addEventListener('click', async e => {
-      const t = e.target.closest('[data-agsong],[data-agproj],[data-agview],[data-agmon],[data-aggoto],[data-agopen],[data-agslide],[data-agdl],[data-agcopy],[data-agsdl],[data-agslink]');
+      const t = e.target.closest('[data-agfsel],[data-agfst],[data-agfnav],[data-agsong],[data-agproj],[data-agview],[data-agmon],[data-aggoto],[data-agopen],[data-agslide],[data-agdl],[data-agcopy],[data-agsdl],[data-agslink]');
       if (!t) return; const d = t.dataset;
+      if (d.agfsel || d.agfst){ ST.fsel = d.agfsel ? 'p:'+d.agfsel : 's:'+d.agfst; friseSelect(t); return; }
+      if (d.agfnav !== undefined){ const n = Number(d.agfnav); if (!n) ST.fstart = null; else { const s0 = pd(friseStart()); s0.setDate(s0.getDate()+n); ST.fstart = iso(s0); } FR.reset = true; render(); return; }
       if (d.agsong){ try { await navigator.clipboard.writeText(d.agsong); toast("Copié : colle-le dans la recherche musique d'Instagram"); } catch(err){ toast(d.agsong); } return; }
       if (d.agslink !== undefined){ const u = slinks(item(d.agslink))[+(d.j || 0)].url; try { await navigator.clipboard.writeText(u); toast('Lien copié : colle-le dans le sticker Lien'); } catch(err){ toast(u); } return; }
       if (d.agsdl){
@@ -3629,11 +3837,11 @@ const AGENDA = (() => {
         try { saveBlob(await mediaBlob(st.media[0]), st.media[0].name); } catch(err){ toast('Téléchargement impossible'); } return;
       }
       if (d.agproj !== undefined){ const id = d.agproj; ST.projects = !id ? [] : ST.projects.includes(id) ? ST.projects.filter(x => x !== id) : [...ST.projects, id]; ls.set('agenda.proj', ST.projects); render(); }
-      else if (d.agview){ ST.view = d.agview; render(); }
+      else if (d.agview){ ST.view = d.agview; ls.set('agenda.view', ST.view); FR.reset = true; render(); }
       else if (d.agmon){ const b = ST.month ? pd(ST.month+'-01') : new Date(new Date().getFullYear(), new Date().getMonth(), 1); b.setMonth(b.getMonth()+Number(d.agmon)); ST.month = iso(b).slice(0,7); render(); }
       else if (d.aggoto){
         const k = d.aggoto; if (k < iso(monday(new Date()))){ ST.past = true; ls.set('agenda.past', true); }
-        ST.view = 'agenda'; render(); const el = g('agd-'+k); el ? el.scrollIntoView({ behavior:'smooth' }) : toast('Rien de prévu ce jour-là');
+        ST.view = 'agenda'; ls.set('agenda.view', 'agenda'); render(); const el = g('agd-'+k); el ? el.scrollIntoView({ behavior:'smooth' }) : toast('Rien de prévu ce jour-là');
       }
       else if (d.agopen) lbOpen(d.agopen);
       else if (d.agslide) lbOpen(d.agslide, +d.i);
@@ -4307,7 +4515,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-agenda-masque';
+const APP_VERSION = '2026-11-08-agenda-frise';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
