@@ -225,6 +225,8 @@ const LETTERS = [
  ['Я','я','ia','v',0,'Se dit « ia ». C’est aussi le mot « je ».','я=je|яблоко=pomme|моя=ma|имя=prénom|семья=famille']
 ];
 
+// Nom de chaque lettre, lu à voix haute : lire « Б » seul fait dire à l'iPhone « заглавная буква Б » (lettre majuscule Б).
+const LNAME = { 'А':'а','Б':'бэ','В':'вэ','Г':'гэ','Д':'дэ','Е':'е','Ё':'ё','Ж':'жэ','З':'зэ','И':'и','Й':'и краткое','К':'ка','Л':'эль','М':'эм','Н':'эн','О':'о','П':'пэ','Р':'эр','С':'эс','Т':'тэ','У':'у','Ф':'эф','Х':'ха','Ц':'цэ','Ч':'че','Ш':'ша','Щ':'ща','Ъ':'твёрдый знак','Ы':'ы','Ь':'мягкий знак','Э':'э','Ю':'ю','Я':'я' };
 const C = (cx, cy, r) => 'M'+(cx-r)+' '+cy+'a'+r+' '+r+' 0 1 0 '+(2*r)+' 0a'+r+' '+r+' 0 1 0 '+(-2*r)+' 0';
 // Vocabulaire : 15 thèmes de 25 mots, "russe=français=image" (image = émoji, texte court, ou #couleur).
 const THEMES = [
@@ -450,8 +452,8 @@ function renderLetter(i){
     '<section class="card glyphcard" aria-label="La lettre '+l[0]+' '+l[1]+'"><div class="glyphs2">'
     + '<div><b class="k-'+l[3]+'">'+l[0]+'</b><span>Majuscule</span></div><div><b class="k-'+l[3]+'">'+l[1]+'</b><span>Minuscule</span></div></div>'
     + '<div class="sayrow"><div class="t"><p class="s1">'+(l[3] === 's' ? 'Sans son' : 'Se dit « '+esc(l[2])+' »')+'</p><p class="sub">'+kind+(l[4] ? ' · faux ami' : '')+'</p></div>'
-    + '<button class="round" data-say="'+l[0]+'" aria-label="Écouter la lettre">'+ICON.speak2+'</button>'
-    + '<button class="round alt" data-say="'+l[0]+'" data-slow="1" aria-label="Écouter lentement">Lent</button></div>'
+    + '<button class="round" data-say="'+LNAME[l[0]]+'" aria-label="Écouter la lettre">'+ICON.speak2+'</button>'
+    + '<button class="round alt" data-say="'+LNAME[l[0]]+'" data-slow="1" aria-label="Écouter lentement">Lent</button></div>'
     + '<div class="note">'+ICON.info+'<p>'+esc(l[5])+'</p></div></section>'
     + '<section class="wlist" aria-labelledby="h-words"><h2 id="h-words">Lis à voix haute <small>'+tested+' / 5 testés</small></h2>'
     + words.map(w => '<div class="wrow" data-row="'+esc(w.ru)+'"><div class="w"><p class="r" lang="ru">'+hl(w.ru, l)+'</p><p class="f">'+esc(w.fr)+'</p></div>'
