@@ -429,8 +429,8 @@ body{padding-top:env(safe-area-inset-top)}
 @media (max-width:899px){
   body.view-meteo.has-tabs header.top{display:none}
   body.view-meteo.has-tabs .wrap{padding:0 0 calc(70px + env(safe-area-inset-bottom));max-width:none}
-  body.view-meteo.has-tabs .toolpane[data-tool="meteo"] .toolbar{margin:0;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;background:var(--surface);border-bottom:1px solid var(--line)}
-  body.view-meteo.has-tabs .toolpane[data-tool="meteo"] .toolback{min-height:36px}
+  body.view-meteo.has-tabs .toolpane .toolbar{margin:0;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;background:var(--surface);border-bottom:1px solid var(--line)}
+  body.view-meteo.has-tabs .toolpane .toolback{min-height:36px}
   body.view-meteo.has-tabs .wxframe{margin:0;border-radius:0;border:0;height:calc(100dvh - 70px - 49px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-height:340px}
 }
 @media (min-width:900px){.wxframe{height:calc(100dvh - 200px);min-height:520px;width:min(1124px, calc(100vw - 220px - 56px))}}
@@ -1055,6 +1055,10 @@ dialog{border-radius:20px}
       <div class="toolpane" data-tool="meteo" hidden>
         <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Météo</h3></div>
         <div class="wxframe"><iframe id="wxframe" title="Miguel Météo : carte du vent, de la pluie, des nuages et de la température" loading="lazy" allow="fullscreen"></iframe></div>
+      </div>
+      <div class="toolpane" data-tool="russe" hidden>
+        <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Miguel Русский</h3></div>
+        <div class="wxframe"><iframe id="rusframe" title="Miguel Русский : apprendre le russe" allow="microphone; autoplay"></iframe></div>
       </div>
       <div class="toolpane" data-tool="pneus" hidden>
       <div class="toolbar"><button class="toolback" type="button" data-toolback>‹ Outils</button><h3 class="tooltitle vh">Pression des pneus</h3></div>
@@ -3135,13 +3139,14 @@ function setView(v, keepScroll){
   if (!VIEWS.includes(v)) v = 'today';
   curView = v;
   for (const s of document.querySelectorAll('#app .view')) s.hidden = s.dataset.view !== v;
-  document.body.classList.toggle('view-meteo', v === 'outils' && typeof curTool !== 'undefined' && curTool === 'meteo');
+  document.body.classList.toggle('view-meteo', v === 'outils' && typeof curTool !== 'undefined' && ['meteo', 'russe'].includes(curTool));
   for (const b of $('tabbar').querySelectorAll('[data-view]')){ if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   updateTitle();
   try { localStorage.setItem('cm-view', v); } catch(_){}
   if (!/access_token|type=/.test(location.hash) && location.hash !== '#'+v) history.replaceState(null, '', '#'+v);
   if (v === 'prog'){ renderLoad(); if (WELL.days.length) drawHealth(); }
   if (v === 'outils' && typeof curTool !== 'undefined' && curTool === 'meteo') loadWxFrame();
+  if (v === 'outils' && typeof curTool !== 'undefined' && curTool === 'russe') loadRusFrame();
   if (!keepScroll) window.scrollTo(0, 0);
 }
 // App Outils « Météo » : meteo.html (Miguel Météo) chargée à la première ouverture, centrée sur la ville de « Moi ».
@@ -3876,10 +3881,19 @@ const TOOLS = [
     icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/>' },
   { id: 'agenda', name: 'Agenda réseaux', title: 'Agenda des publications', color: '#B8501F',
     icon: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15.5l3-2v4l-3-2zM11 13.5h2.5l2.5-1.5v7l-2.5-1.5H11"/>' },
+  { id: 'russe', name: 'Miguel Русский', title: 'Miguel Русский', color: '#9E3442',
+    icon: '<path d="M16 4v16M16 4h-5a4 4 0 0 0 0 8h5M11.5 12L7 20"/>' },
   { id: 'colis', name: 'Suivi colis', title: 'Suivi de colis', color: '#2F72B5',
     icon: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8M7.5 5.5l9 5"/>' }
 ];
 let curTool = null;
+// Apps chargées dans un cadre plein écran sur téléphone (classe view-meteo : en-tête masqué).
+const FRAME_TOOLS = ['meteo', 'russe'];
+// App « Miguel Русский » (09/11/2026) : langue.html (alphabet et vocabulaire russes) chargée à la première ouverture.
+function loadRusFrame(){
+  const f = $('rusframe'), src = 'langue.html?v=' + encodeURIComponent(typeof APP_VERSION !== 'undefined' ? APP_VERSION : '');
+  if (f.dataset.src !== src){ f.dataset.src = src; f.src = src; }
+}
 function renderLauncher(){
   $('applaunch').innerHTML = TOOLS.map(t => '<button class="apptile" type="button" data-tool-open="'+t.id+'"><span class="aico" style="background:'+t.color+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+t.icon+'</svg></span><span class="alab">'+esc(t.name)+'</span></button>').join('');
 }
@@ -3892,8 +3906,9 @@ function openTool(id){
   if (t && t.id === 'pneus' && state.user){ try { renderTire(); } catch(_){} }
   if (t && t.id === 'colis' && state.user){ try { renderColis(); } catch(_){} }
   if (t && t.id === 'agenda') AGENDA.open();
-  document.body.classList.toggle('view-meteo', curView === 'outils' && curTool === 'meteo');
+  document.body.classList.toggle('view-meteo', curView === 'outils' && FRAME_TOOLS.includes(curTool));
   if (t && t.id === 'meteo') loadWxFrame();
+  if (t && t.id === 'russe') loadRusFrame();
   if (curView === 'outils'){ updateTitle(); window.scrollTo(0, 0); }
 }
 renderLauncher();
@@ -4520,7 +4535,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-08-meteo-outils';
+const APP_VERSION = '2026-11-09-russe';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
