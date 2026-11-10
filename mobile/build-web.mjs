@@ -7,6 +7,6 @@ const root = join(here, '..');
 const www = join(here, 'www');
 rmSync(www, { recursive: true, force: true });
 mkdirSync(www, { recursive: true });
-for (const f of ['index.html', 'meteo.html', 'langue.html', 'favicon.png', 'apple-touch-icon.png', 'coach-miguel-logo.png', 'coach-miguel-logo.svg'])
+for (const f of ['index.html', 'meteo.html', 'langue.html', 'muscu.html', 'favicon.png', 'apple-touch-icon.png', 'coach-miguel-logo.png', 'coach-miguel-logo.svg'])
   cpSync(join(root, f), join(www, f));
 console.log('www/ prêt');
