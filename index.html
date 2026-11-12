@@ -3534,7 +3534,7 @@ const AGENDA = (() => {
         const dt = pd(d);
         h += '<div class="agday'+(d === tod ? ' today' : '')+'" id="agd-'+d+'" data-n="'+dt.getDate()+'"><div class="agdl">'+DAYS[dt.getDay()]+' '+dt.getDate()+' '+MONTHS[dt.getMonth()]+(d === tod ? '<em>Aujourd\'hui</em>' : '')+'</div>';
         for (const p of posts.filter(x => x.date === d)) h += card(p);
-        const ss = stories.filter(s => s.date === d);
+        const ss = stories.filter(s => s.date === d).sort(byT);
         if (ss.length) h += '<div class="agstories">' + ss.map(storyHTML).join('') + '</div>';
         h += '</div>';
       }
@@ -3556,8 +3556,10 @@ const AGENDA = (() => {
     }
     h += '</div></section>'; g('agmain').innerHTML = h;
   }
+  const hm = t => { const [h, m] = String(t).split(':'); return (+h)+' h'+(m && m !== '00' ? ' '+m : ''); };
+  const byT = (a, b) => (a.time || '99').localeCompare(b.time || '99');
   function storyHTML(s){
-    return '<div class="agstory'+(done[skey(s)] ? ' done' : '')+'" style="--c:'+esc(proj(s.project).color)+'"><span class="agdot"></span><span class="agtag">Story</span>'+esc(s.text) +
+    return '<div class="agstory'+(done[skey(s)] ? ' done' : '')+'" style="--c:'+esc(proj(s.project).color)+'"><span class="agdot"></span>'+(s.time ? '<span class="agtime" title="Heure de publication recommandée">'+esc(hm(s.time))+'</span>' : '')+'<span class="agtag">Story</span>'+esc(s.text) +
       slinks(s).map(l => '<span class="agstl">🔗 '+(l.label ? esc(l.label)+' : ' : '')+esc(l.url)+'</span>').join('') + music(s.music) + stMedia(s) +
       '<label class="agchk agstchk"><input type="checkbox" data-agdone="'+esc(skey(s))+'" '+(done[skey(s)] ? 'checked' : '')+'> Publié</label></div>';
   }
@@ -3589,7 +3591,7 @@ const AGENDA = (() => {
     if (!ST.fsel) return '';
     if (ST.fsel.startsWith('p:')){ const p = DATA.posts.find(x => x.id === ST.fsel.slice(2)); return p ? card(p) : ''; }
     const [pr, d] = ST.fsel.slice(2).split('|'), dt = pd(d);
-    const ss = DATA.stories.filter(s => s.project === pr && s.date === d);
+    const ss = DATA.stories.filter(s => s.project === pr && s.date === d).sort(byT);
     return ss.length ? '<h4 class="agfdh">Stories · '+esc(proj(pr).name)+' · '+DAYS[dt.getDay()]+' '+dt.getDate()+' '+MONTHS[dt.getMonth()]+'</h4><div class="agstories">'+ss.map(storyHTML).join('')+'</div>' : '';
   }
   function friseThumb(p, w, h, tod){
@@ -4548,7 +4550,7 @@ $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').cl
 // GitHub Pages et les navigateurs mobiles gardent la page en cache un moment : on compare APP_VERSION avec
 // celle du fichier en ligne (sans cache) au chargement et au retour sur l'onglet, et on propose de recharger.
 // À changer à chaque mise en ligne.
-const APP_VERSION = '2026-11-10-muscu-1';
+const APP_VERSION = '2026-11-12-agenda-heure-story';
 // Initiale du menu latéral (ordinateur) = celle du bouton de l'en-tête.
 new MutationObserver(() => { $('sideav').textContent = $('profav').textContent; }).observe($('profav'), { childList: true, characterData: true, subtree: true });
 let verAt = 0;
